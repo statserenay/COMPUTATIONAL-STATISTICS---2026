@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inverse Transform Method — R Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #f0ece2;
+  --bg2:    #e8e2d6;
+  --bg3:    #ddd7c9;
+  --line:   #c8c0b0;
+  --ink:    #1e1e2e;
+  --ink2:   #3a3a4e;
+  --gold:   #b5640a;
+  --gold2:  #d4820e;
+  --teal:   #0e7c75;
+  --teal2:  #1aada4;
+  --rose:   #b83232;
+  --violet: #6b3fa0;
+  --green:  #1a7a3c;
+  --text:   #1e1e2e;
+  --muted:  #6b6878;
+  --shadow: rgba(30,30,46,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7}
+
+/* Status bars */
+#init-bar,#ready-bar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:.55rem 1.5rem;font-family:'Source Code Pro',monospace;font-size:.72rem;display:flex;align-items:center;gap:.7rem;transition:opacity .5s}
+#init-bar{background:#2e2e3e;color:#aaa8be;border-bottom:1px solid #444}
+#ready-bar{background:#d4edda;color:#145a2b;border-bottom:1px solid #a8d5b5;display:none}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#f0c96a;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Hero */
+.hero{background:linear-gradient(150deg,#1e1e2e 0%,#2a2040 55%,#1a1a30 100%);border-bottom:4px solid var(--gold);padding:5.5rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(212,168,67,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,67,.07) 1px,transparent 1px);background-size:44px 44px}
+.hero-glow{position:absolute;top:-80px;right:-80px;width:480px;height:480px;background:radial-gradient(circle,rgba(26,173,164,.12) 0%,transparent 65%);pointer-events:none}
+.hero-inner{position:relative;max-width:820px;margin:0 auto}
+.hero-label{font-family:'Source Code Pro',monospace;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#1aada4;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.hero-label::before{content:'▸'}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;line-height:1.1;letter-spacing:-.02em;color:#f5f0e8}
+.hero h1 em{color:#f0c96a;font-style:italic}
+.hero-sub{margin-top:1.25rem;font-size:1.05rem;font-weight:300;color:rgba(245,240,232,.65);max-width:560px;line-height:1.8}
+.toc{margin-top:2rem;display:flex;flex-wrap:wrap;gap:.5rem}
+.toc-item{font-family:'Source Code Pro',monospace;font-size:.67rem;letter-spacing:.06em;padding:.3rem .8rem;border:1px solid rgba(245,240,232,.2);border-radius:3px;color:rgba(245,240,232,.6);transition:color .15s,border-color .15s;text-decoration:none}
+.toc-item:hover{color:#f0c96a;border-color:#f0c96a}
+
+/* Progress nav */
+.progress-nav{position:sticky;top:0;z-index:50;background:rgba(240,236,226,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:.55rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px var(--shadow)}
+.pnav-label{font-family:'Source Code Pro',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap}
+.pnav-track{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.pnav-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:2px;transition:width .4s;width:0%}
+.pnav-count{font-family:'Source Code Pro',monospace;font-size:.62rem;color:var(--gold);white-space:nowrap;font-weight:600}
+
+/* Page */
+.page{max-width:860px;margin:0 auto;padding:0 1.25rem 6rem}
+
+/* Section */
+.section{margin-top:4rem;padding-top:1.5rem;border-top:2px solid var(--line)}
+.sec-num{font-family:'Source Code Pro',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:.55rem}
+.section h2{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;font-style:italic;line-height:1.25;margin-bottom:1.25rem;color:var(--ink)}
+.section h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin:1.75rem 0 .7rem;color:var(--gold)}
+.section p{font-size:.97rem;font-weight:300;color:var(--ink2);margin-bottom:1rem;line-height:1.8}
+.section p strong{color:var(--ink);font-weight:600}
+.section p em{color:var(--gold);font-style:italic}
+
+/* Math block */
+.math-block{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:4px;padding:1.25rem 1.5rem;margin:1.25rem 0;font-family:'Source Code Pro',monospace;font-size:.88rem;line-height:2.1;color:var(--ink);overflow-x:auto;box-shadow:0 2px 8px var(--shadow)}
+.math-block .label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block}
+.math-block .eq .op{color:var(--teal)}
+.math-block .eq .hi{color:var(--gold);font-weight:600}
+.math-block .result{color:var(--green);font-weight:600}
+
+/* Algo card */
+.algo-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1.5rem;margin:1.25rem 0;box-shadow:0 2px 8px var(--shadow)}
+.algo-title{font-family:'Source Code Pro',monospace;font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.algo-title::before{content:'◆';font-size:.5rem}
+.algo-steps{list-style:none;counter-reset:step}
+.algo-steps li{counter-increment:step;padding:.6rem 0 .6rem 2.6rem;position:relative;font-size:.95rem;font-weight:300;border-bottom:1px solid var(--bg2);color:var(--ink2)}
+.algo-steps li:last-child{border-bottom:none}
+.algo-steps li::before{content:counter(step);position:absolute;left:0;font-family:'Source Code Pro',monospace;font-size:.68rem;font-weight:700;color:#fff;background:var(--gold);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;top:.72rem}
+.algo-steps li code{font-family:'Source Code Pro',monospace;font-size:.79rem;background:#fff3e0;color:var(--gold);border:1px solid #ffd699;padding:.1em .4em;border-radius:2px}
+
+/* Callouts */
+.callout{border-radius:4px;padding:1rem 1.25rem;margin:1rem 0;font-size:.9rem;font-weight:300;line-height:1.7;display:flex;gap:.75rem}
+.callout.info{background:#e6f7f6;border-left:3px solid var(--teal2);color:var(--ink2)}
+.callout.warn{background:#fdecea;border-left:3px solid var(--rose);color:var(--ink2)}
+.callout.tip{background:#f3eeff;border-left:3px solid var(--violet);color:var(--ink2)}
+.callout-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+.callout strong{color:var(--ink)}
+
+/* Dist header */
+.dist-header{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin:2rem 0 1rem;padding:.9rem 1.25rem;background:#fff;border:1px solid var(--line);border-radius:5px;box-shadow:0 1px 4px var(--shadow)}
+.dist-badge{font-family:'Source Code Pro',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.22rem .6rem;border-radius:3px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.dist-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink)}
+.dist-formula{font-family:'Source Code Pro',monospace;font-size:.76rem;color:var(--gold);margin-left:auto}
+
+/* Live code block */
+.live-block{margin:1rem 0 1.5rem;border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 3px 14px var(--shadow)}
+.live-topbar{background:#2e2e3e;border-bottom:1px solid #444;padding:.45rem 1rem;display:flex;align-items:center;gap:.5rem;font-family:'Source Code Pro',monospace;font-size:.62rem;color:#888}
+.live-dot{width:9px;height:9px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+.live-filename{margin-left:auto;letter-spacing:.05em;color:#aaa}
+
+textarea.live-editor{width:100%;background:#1e1e2e;color:#cdd6f4;font-family:'Source Code Pro',monospace;font-size:.83rem;line-height:1.8;padding:1rem 1.25rem;border:none;outline:none;resize:vertical;min-height:80px;tab-size:2}
+textarea.live-editor::placeholder{color:#45475a;font-style:italic}
+
+.live-ctrlbar{background:#27273a;border-top:1px solid #3a3a4e;padding:.5rem 1rem;display:flex;align-items:center;gap:.6rem}
+.run-btn{font-family:'Source Code Pro',monospace;font-size:.7rem;font-weight:700;background:var(--gold2);color:#fff;border:none;border-radius:3px;padding:.44rem 1.1rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:background .15s,transform .1s;letter-spacing:.03em}
+.run-btn:hover{background:var(--gold)}
+.run-btn:active{transform:scale(.97)}
+.run-btn:disabled{background:#45475a;color:#888;cursor:not-allowed}
+.clr-btn{font-family:'Source Code Pro',monospace;font-size:.68rem;background:none;color:#888;border:1px solid #3a3a4e;border-radius:3px;padding:.44rem .8rem;cursor:pointer;transition:color .15s}
+.clr-btn:hover{color:#cdd6f4;border-color:#888}
+.run-status{font-family:'Source Code Pro',monospace;font-size:.65rem;margin-left:auto}
+.run-status.ok{color:#a6e3a1}.run-status.err{color:#f38ba8}.run-status.run{color:#f9e2af}
+
+.live-output{background:#11111b;border-top:1px solid #2a2a3e;font-family:'Source Code Pro',monospace;font-size:.81rem;line-height:1.75;padding:.85rem 1.25rem;white-space:pre-wrap;overflow-x:auto;max-height:340px;overflow-y:auto;display:none;color:#a6adc8}
+.live-output.on{display:block}
+.out-ok{color:#89dceb}.out-err{color:#f38ba8}.out-warn{color:#f9e2af}
+
+/* Plot area */
+.plot-area{background:#fff;border-top:1px solid var(--line);padding:.75rem;display:none;text-align:center}
+.plot-area.on{display:block}
+.plot-area canvas{max-width:100%;border-radius:3px;box-shadow:0 2px 8px var(--shadow)}
+
+/* Answer */
+.ans-wrap{margin:.5rem 0 1.5rem;border:1px solid #c5e8d0;border-radius:4px;overflow:hidden;display:none;box-shadow:0 1px 4px var(--shadow)}
+.ans-wrap.on{display:block}
+.ans-header{background:#e8f5ed;border-bottom:1px solid #c5e8d0;padding:.35rem .9rem;font-family:'Source Code Pro',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.ans-code{background:#1e2d1e;color:#a6e3a1;font-family:'Source Code Pro',monospace;font-size:.81rem;line-height:1.75;padding:.85rem 1.1rem;white-space:pre;overflow-x:auto}
+.ans-comment{color:#4a7a4a;font-style:italic}
+
+/* Details */
+details{margin:.5rem 0 1.5rem}
+details summary{font-family:'Source Code Pro',monospace;font-size:.72rem;color:var(--gold);cursor:pointer;padding:.5rem 0;letter-spacing:.05em;user-select:none}
+details summary:hover{color:var(--gold2)}
+
+/* Summary */
+.summary{margin-top:3rem;background:linear-gradient(135deg,#1e1e2e,#2a2040);border-radius:8px;padding:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1.5rem;text-align:center;box-shadow:0 4px 20px var(--shadow)}
+.sum-stat .num{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;font-style:italic;line-height:1;color:#f5f0e8}
+.num.gold{color:#f0c96a}.num.teal{color:#89dceb}.num.violet{color:#cba6f7}
+.sum-stat .lbl{font-family:'Source Code Pro',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,240,232,.45);margin-top:.3rem}
+
+p code,li code{font-family:'Source Code Pro',monospace;font-size:.8rem;background:#fff3e0;color:var(--gold);border:1px solid #ffd699;padding:.1em .4em;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="init-bar"><div class="spin"></div> Initialising WebR — R engine loading, please wait…</div>
+<div id="ready-bar">✓ &nbsp; R engine ready — all code blocks execute live in your browser</div>
+
+<div class="hero">
+  <div class="hero-grid"></div><div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-label">Computational Statistics · Live R Tutorial</div>
+    <h1>Inverse Transform<br><em>Method</em></h1>
+    <p class="hero-sub">Generate random samples from any distribution whose CDF can be inverted — complete derivations, live R output, and canvas plots rendered directly in the browser.</p>
+    <div class="toc">
+      <a class="toc-item" href="#theory">1. Theory</a>
+      <a class="toc-item" href="#exp">2. Exponential</a>
+      <a class="toc-item" href="#uniform">3. Uniform(a,b)</a>
+      <a class="toc-item" href="#weibull">4. Weibull</a>
+      <a class="toc-item" href="#cauchy">5. Cauchy</a>
+      <a class="toc-item" href="#discrete">6. Discrete</a>
+      <a class="toc-item" href="#practice">7. Practice</a>
+    </div>
+  </div>
+</div>
+
+<div class="progress-nav">
+  <span class="pnav-label">Blocks executed</span>
+  <div class="pnav-track"><div class="pnav-fill" id="pnav-fill"></div></div>
+  <span class="pnav-count" id="pnav-count">0 / 9</span>
+</div>
+
+<div class="page">
+
+<!-- ── §1 THEORY ── -->
+<div class="section" id="theory">
+  <div class="sec-num">Section 01</div>
+  <h2>The Core Idea</h2>
+  <p>The <strong>Inverse Transform Method</strong> is the most fundamental algorithm for generating random variates from a target distribution. The key insight: if you can invert the CDF, you can convert <em>Uniform(0,1)</em> samples into samples from any distribution.</p>
+  <h3>The Probability Integral Transform</h3>
+  <div class="math-block">
+    <span class="label">Probability Integral Transform — Theorem</span>
+    <div class="eq">If  U ~ Uniform(0,1)  and  F has inverse F<span class="op">⁻¹</span>,  then</div>
+    <div class="eq" style="margin-top:.3rem"><span class="hi">X = F⁻¹(U)</span>  has CDF  F(x)</div>
+  </div>
+  <h3>Proof</h3>
+  <div class="math-block">
+    <div class="eq">P(F⁻¹(U) ≤ x)  <span class="op">=</span>  P(U ≤ F(x))  <span class="op">=</span>  <span class="result">F(x)  ✓</span></div>
+    <div class="eq" style="color:var(--muted);margin-top:.3rem">because P(U ≤ t) = t for t ∈ [0,1] when U ~ Uniform(0,1)</div>
+  </div>
+  <div class="algo-card">
+    <div class="algo-title">General Algorithm — 5 Steps</div>
+    <ol class="algo-steps">
+      <li>Identify target PDF <code>f(x)</code> and integrate to obtain CDF <code>F(x)</code></li>
+      <li>Solve for the quantile function: <code>F⁻¹(u)</code> (algebraically invert the CDF)</li>
+      <li>Generate <code>U ~ Uniform(0,1)</code> using <code>runif(n)</code> in R</li>
+      <li>Compute <code>X = F⁻¹(U)</code> — these are your target random samples</li>
+      <li>Verify: compare sample statistics and histogram against the true PDF</li>
+    </ol>
+  </div>
+  <div class="callout info">
+    <span class="callout-icon">ℹ</span>
+    <div><strong>Why it works:</strong> R's <code>runif()</code> produces high-quality U(0,1) pseudo-random numbers. Any smooth invertible CDF maps those uniforms exactly into the target distribution — no rejection, no approximation.</div>
+  </div>
+</div>
+
+<!-- ── §2 EXPONENTIAL ── -->
+<div class="section" id="exp">
+  <div class="sec-num">Section 02</div>
+  <h2>Exponential Distribution</h2>
+  <div class="dist-header">
+    <span class="dist-badge">Continuous</span>
+    <span class="dist-title">Exponential(λ)</span>
+    <span class="dist-formula">f(x) = λ e^{−λx},  x ≥ 0</span>
+  </div>
+  <h3>Step 1 — CDF</h3>
+  <div class="math-block">
+    <div class="eq">F(x)  <span class="op">=</span>  ∫₀ˣ λ e<span class="op">^{−λt}</span> dt  <span class="op">=</span>  <span class="hi">1 − e^{−λx}</span></div>
+  </div>
+  <h3>Step 2 — Invert</h3>
+  <div class="math-block">
+    <div class="eq">u = 1 − e<span class="op">^{−λx}</span>   ⟹   e<span class="op">^{−λx}</span> = 1−u   ⟹   x = −(1/λ)·ln(1−u)</div>
+    <div class="eq result" style="margin-top:.4rem">∴  F⁻¹(u)  =  −ln(U) / λ   (since 1−U ~ U(0,1) also)</div>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">✦</span>
+    <div>Since <code>1 − U</code> is also Uniform(0,1), we simplify to <strong>−ln(U)/λ</strong>. Both forms produce the same distribution.</div>
+  </div>
+
+  <h3>Statistics check</h3>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">exp_stats.R</span></div>
+    <textarea class="live-editor" id="ed-exp" rows="14">
+# ── Inverse Transform: Exponential(λ = 2) ─────────────────
+set.seed(42)
+lambda <- 2
+n      <- 5000
+
+# Step 1: U ~ Uniform(0,1)
+U <- runif(n)
+
+# Step 2: X = F⁻¹(U) = -log(U)/lambda
+X <- -log(U) / lambda
+
+cat("=== Exponential(lambda = 2) ===\n")
+cat(sprintf("Theoretical mean     : %.5f  (= 1/lambda)\n",    1/lambda))
+cat(sprintf("Sample mean          : %.5f\n",                   mean(X)))
+cat(sprintf("Theoretical variance : %.5f  (= 1/lambda^2)\n",  1/lambda^2))
+cat(sprintf("Sample variance      : %.5f\n",                   var(X)))
+cat(sprintf("Theoretical median   : %.5f  (= ln2/lambda)\n",  log(2)/lambda))
+cat(sprintf("Sample median        : %.5f\n",                   median(X)))
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('exp')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('exp')">Clear</button>
+      <span class="run-status" id="st-exp"></span>
+    </div>
+    <div class="live-output" id="out-exp"></div>
+  </div>
+
+  <h3>Histogram with PDF overlay</h3>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">exp_plot.R</span></div>
+    <textarea class="live-editor" id="ed-exp2" rows="14">
+# ── Histogram + true PDF overlay ──────────────────────────
+set.seed(42)
+lambda <- 2;  n <- 5000
+U <- runif(n)
+X <- -log(U) / lambda
+
+hist(X, breaks = 60, freq = FALSE,
+     main = "Exponential(2) via Inverse Transform",
+     xlab = "x", ylab = "Density",
+     col  = "#cce5ff", border = "#4a90d9",
+     xlim = c(0, 4))
+
+x_seq <- seq(0.001, 4, length.out = 300)
+lines(x_seq, dexp(x_seq, rate = lambda), col = "#c0392b", lwd = 2.5)
+
+legend("topright",
+       legend = c("ITM histogram", "True PDF: 2·e^{-2x}"),
+       col    = c("#4a90d9", "#c0392b"), lwd = c(8, 2.5), bty = "n", cex = 0.85)
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runPlot('exp2','plot-exp2')">▶ Run &amp; Plot</button>
+      <button class="clr-btn" onclick="clearPlot('exp2','plot-exp2')">Clear</button>
+      <span class="run-status" id="st-exp2"></span>
+    </div>
+    <div class="live-output" id="out-exp2"></div>
+    <div class="plot-area" id="plot-exp2"></div>
+  </div>
+</div>
+
+<!-- ── §3 UNIFORM ── -->
+<div class="section" id="uniform">
+  <div class="sec-num">Section 03</div>
+  <h2>Uniform(a, b) Distribution</h2>
+  <div class="dist-header">
+    <span class="dist-badge">Continuous</span>
+    <span class="dist-title">Uniform(a, b)</span>
+    <span class="dist-formula">f(x) = 1/(b−a),  a ≤ x ≤ b</span>
+  </div>
+  <div class="math-block">
+    <div class="eq">F(x) = (x−a)/(b−a)   ⟹   u(b−a) = x−a</div>
+    <div class="eq result" style="margin-top:.3rem">∴  F⁻¹(u) = a + u·(b−a)</div>
+  </div>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">uniform_itm.R</span></div>
+    <textarea class="live-editor" id="ed-uni" rows="12">
+# ── Inverse Transform: Uniform(3, 8) ──────────────────────
+set.seed(7)
+a <- 3;  b <- 8;  n <- 5000
+
+U <- runif(n)
+X <- a + U * (b - a)      # F⁻¹(u) = a + u*(b-a)
+
+cat("=== Uniform(3, 8) via ITM ===\n")
+cat(sprintf("Theoretical mean : %.4f\n", (a+b)/2))
+cat(sprintf("Sample mean      : %.4f\n", mean(X)))
+cat(sprintf("Theoretical var  : %.4f\n", (b-a)^2/12))
+cat(sprintf("Sample variance  : %.4f\n", var(X)))
+cat(sprintf("Observed range   : [%.4f, %.4f]\n", min(X), max(X)))
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('uni')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('uni')">Clear</button>
+      <span class="run-status" id="st-uni"></span>
+    </div>
+    <div class="live-output" id="out-uni"></div>
+  </div>
+</div>
+
+<!-- ── §4 WEIBULL ── -->
+<div class="section" id="weibull">
+  <div class="sec-num">Section 04</div>
+  <h2>Weibull Distribution</h2>
+  <div class="dist-header">
+    <span class="dist-badge">Reliability</span>
+    <span class="dist-title">Weibull(k, λ)</span>
+    <span class="dist-formula">f(x) = (k/λ)(x/λ)^{k−1} e^{−(x/λ)^k}</span>
+  </div>
+  <div class="math-block">
+    <div class="eq">F(x) = 1 − exp(−(x/λ)<span class="op">^k</span>)</div>
+    <div class="eq" style="margin-top:.3rem">u = 1−exp(−(x/λ)^k)  ⟹  (x/λ)^k = −ln(1−u)</div>
+    <div class="eq result" style="margin-top:.3rem">∴  F⁻¹(u) = λ·(−ln(1−u))^{1/k}</div>
+  </div>
+  <p>Shape <em>k &gt; 1</em>: increasing hazard; <em>k = 1</em>: Exponential; <em>k &lt; 1</em>: decreasing hazard.</p>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">weibull_itm.R</span></div>
+    <textarea class="live-editor" id="ed-wei" rows="15">
+# ── Inverse Transform: Weibull(k=2, scale=3) ──────────────
+set.seed(123)
+k <- 2;  lambda <- 3;  n <- 5000
+
+U <- runif(n)
+X <- lambda * (-log(1 - U))^(1/k)   # F⁻¹(u)
+
+theo_mean <- lambda * gamma(1 + 1/k)
+theo_var  <- lambda^2 * (gamma(1 + 2/k) - gamma(1 + 1/k)^2)
+
+cat("=== Weibull(k=2, lambda=3) ===\n")
+cat(sprintf("Theoretical mean     : %.5f\n", theo_mean))
+cat(sprintf("Sample mean          : %.5f\n", mean(X)))
+cat(sprintf("Theoretical variance : %.5f\n", theo_var))
+cat(sprintf("Sample variance      : %.5f\n", var(X)))
+cat(sprintf("Built-in rweibull()  : %.5f  (mean)\n", mean(rweibull(n, shape=k, scale=lambda))))
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('wei')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('wei')">Clear</button>
+      <span class="run-status" id="st-wei"></span>
+    </div>
+    <div class="live-output" id="out-wei"></div>
+  </div>
+</div>
+
+<!-- ── §5 CAUCHY ── -->
+<div class="section" id="cauchy">
+  <div class="sec-num">Section 05</div>
+  <h2>Cauchy Distribution</h2>
+  <div class="dist-header">
+    <span class="dist-badge">Heavy-tailed</span>
+    <span class="dist-title">Cauchy(x₀, γ)</span>
+    <span class="dist-formula">f(x) = 1/[πγ(1+((x−x₀)/γ)²)]</span>
+  </div>
+  <div class="math-block">
+    <div class="eq">F(x) = ½ + (1/π)·arctan((x−x₀)/γ)</div>
+    <div class="eq" style="margin-top:.3rem">π(u−½) = arctan((x−x₀)/γ)   ⟹   x−x₀ = γ·tan(π(u−½))</div>
+    <div class="eq result" style="margin-top:.3rem">∴  F⁻¹(u) = x₀ + γ·tan(π(u−½))</div>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">⚠</span>
+    <div><strong>No moments exist.</strong> Mean and variance are undefined. The sample mean does NOT converge — the Law of Large Numbers fails spectacularly. Always use the <em>median</em> for location.</div>
+  </div>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">cauchy_itm.R</span></div>
+    <textarea class="live-editor" id="ed-cau" rows="18">
+# ── Inverse Transform: Cauchy(x0=0, gamma=1) ──────────────
+set.seed(99)
+x0 <- 0;  gamma_par <- 1;  n <- 5000
+
+U <- runif(n)
+X <- x0 + gamma_par * tan(pi * (U - 0.5))  # F⁻¹(u)
+
+cat("=== Cauchy(x0=0, gamma=1) ===\n")
+cat(sprintf("Median (→ x0=0)  : %.4f\n",  median(X)))
+cat(sprintf("IQR    (→ 2γ=2)  : %.4f\n",  IQR(X)))
+cat(sprintf("Mean (undefined) : %.4f  ← unstable!\n", mean(X)))
+
+# Demonstrate non-convergence of the running mean
+rm <- cumsum(X) / seq_along(X)
+cat("\n--- Running mean does NOT converge ---\n")
+for(n_ in c(50, 200, 500, 2000, 5000))
+  cat(sprintf("  n = %5d : running mean = %9.3f\n", n_, rm[n_]))
+cat("\n→ Contrast with median which converges to 0\n")
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('cau')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('cau')">Clear</button>
+      <span class="run-status" id="st-cau"></span>
+    </div>
+    <div class="live-output" id="out-cau"></div>
+  </div>
+</div>
+
+<!-- ── §6 DISCRETE ── -->
+<div class="section" id="discrete">
+  <div class="sec-num">Section 06</div>
+  <h2>Discrete Distributions</h2>
+  <p>For discrete distributions the CDF is a step function. The inverse is defined as:</p>
+  <div class="math-block">
+    <div class="eq">F<span class="op">⁻¹</span>(u)  <span class="op">=</span>  <span class="hi">min{ x : F(x) ≥ u }</span></div>
+    <div class="eq" style="color:var(--muted);margin-top:.3rem">Find the smallest x whose cumulative probability first reaches or exceeds u</div>
+  </div>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">discrete_itm.R</span></div>
+    <textarea class="live-editor" id="ed-dis" rows="20">
+# ── Custom Discrete: P(X=1)=0.1, P(X=2)=0.3, P(X=3)=0.4, P(X=4)=0.2
+set.seed(55)
+vals  <- c(1, 2, 3, 4)
+probs <- c(0.1, 0.3, 0.4, 0.2)
+cum_p <- cumsum(probs)       # step-function CDF
+n     <- 10000
+
+cat("CDF:\n")
+for(i in seq_along(vals))
+  cat(sprintf("  F(%d) = %.2f\n", vals[i], cum_p[i]))
+
+# ITM: for each u, find smallest index where cum_p >= u
+U <- runif(n)
+X <- sapply(U, function(u) vals[min(which(cum_p >= u))])
+
+cat("\n=== Empirical vs Theoretical Frequencies ===\n")
+emp <- table(X) / n
+for(i in seq_along(vals))
+  cat(sprintf("  P(X=%d): theoretical=%.2f  empirical=%.4f\n",
+              vals[i], probs[i], emp[as.character(vals[i])]))
+
+cat(sprintf("\nExpected mean : %.4f\n", sum(vals * probs)))
+cat(sprintf("Sample mean   : %.4f\n",  mean(X)))
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('dis')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('dis')">Clear</button>
+      <span class="run-status" id="st-dis"></span>
+    </div>
+    <div class="live-output" id="out-dis"></div>
+  </div>
+
+  <h3>Geometric Distribution</h3>
+  <div class="math-block">
+    <div class="eq result">F⁻¹(u) = ⌈ log(1−u) / log(1−p) ⌉  =  ceiling(log(1−u)/log(1−p))</div>
+  </div>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">geometric_itm.R</span></div>
+    <textarea class="live-editor" id="ed-geo" rows="12">
+# ── Inverse Transform: Geometric(p = 0.3) ─────────────────
+set.seed(21)
+p <- 0.3;  n <- 10000
+
+U <- runif(n)
+X <- ceiling(log(1 - U) / log(1 - p))   # F⁻¹(u)
+
+cat("=== Geometric(p=0.3) ===\n")
+cat(sprintf("Theoretical mean : %.4f  (= 1/p)\n",        1/p))
+cat(sprintf("Sample mean      : %.4f\n",                  mean(X)))
+cat(sprintf("Theoretical var  : %.4f  (= (1-p)/p^2)\n", (1-p)/p^2))
+cat(sprintf("Sample variance  : %.4f\n",                  var(X)))
+cat("\nFirst 12 values:", head(X, 12), "\n")
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('geo')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('geo')">Clear</button>
+      <span class="run-status" id="st-geo"></span>
+    </div>
+    <div class="live-output" id="out-geo"></div>
+  </div>
+</div>
+
+<!-- ── §7 PRACTICE ── -->
+<div class="section" id="practice">
+  <div class="sec-num">Section 07</div>
+  <h2>Practice Problems</h2>
+
+  <div class="dist-header">
+    <span class="dist-badge">Problem 1</span>
+    <span class="dist-title">Pareto(α, x_m)</span>
+    <span class="dist-formula">F(x) = 1 − (x_m/x)^α,  x ≥ x_m</span>
+  </div>
+  <p>Derive <code>F⁻¹(u)</code> and generate 5000 samples with <code>alpha=2, x_m=1</code>. Verify sample mean ≈ <code>α·x_m/(α−1) = 2</code>.</p>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">practice_pareto.R</span></div>
+    <textarea class="live-editor" id="ed-p1" rows="10" placeholder="# Set u = 1 - (x_m/x)^alpha and solve for x ...
+alpha <- 2;  x_m <- 1;  n <- 5000
+set.seed(42)
+U <- runif(n)
+# X <- ...
+
+# cat(sprintf('Sample mean      : %.4f\n', mean(X)))
+# cat(sprintf('Theoretical mean : %.4f\n', alpha*x_m/(alpha-1)))
+"></textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('p1')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('p1')">Clear</button>
+      <span class="run-status" id="st-p1"></span>
+    </div>
+    <div class="live-output" id="out-p1"></div>
+  </div>
+  <details>
+    <summary>▸ Show Answer — Pareto derivation &amp; R code</summary>
+    <div class="ans-wrap on" style="margin-top:.5rem">
+      <div class="ans-header">✓ Model Answer</div>
+      <div class="ans-code"><span class="ans-comment"># u = 1-(x_m/x)^alpha  ⟹  (x_m/x)^alpha = 1-u</span>
+<span class="ans-comment"># x_m/x = (1-u)^(1/alpha)  ⟹  x = x_m*(1-u)^(-1/alpha)</span>
+
+alpha &lt;- 2;  x_m &lt;- 1;  n &lt;- 5000
+set.seed(42)
+U &lt;- runif(n)
+X &lt;- x_m * (1 - U)^(-1/alpha)   <span class="ans-comment"># F⁻¹(u)</span>
+
+cat(sprintf("Sample mean      : %.4f\n", mean(X)))
+cat(sprintf("Theoretical mean : %.4f\n", alpha*x_m/(alpha-1)))</div>
+    </div>
+  </details>
+
+  <div class="dist-header">
+    <span class="dist-badge">Problem 2</span>
+    <span class="dist-title">Logistic(μ, s)</span>
+    <span class="dist-formula">F(x) = 1/(1 + e^{−(x−μ)/s})</span>
+  </div>
+  <p>The CDF is given. Derive <code>F⁻¹(u)</code> and generate 5000 samples with <code>mu=0, s=1</code>. Verify mean ≈ 0 and variance ≈ π²/3 ≈ 3.29.</p>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">practice_logistic.R</span></div>
+    <textarea class="live-editor" id="ed-p2" rows="10" placeholder="# F(x) = 1/(1+exp(-(x-mu)/s))
+# Set u = F(x) and solve for x ...
+mu <- 0;  s <- 1;  n <- 5000
+set.seed(7)
+U <- runif(n)
+# X <- ...
+
+# cat(sprintf('Sample mean : %.4f  (theoretical: 0)\n', mean(X)))
+# cat(sprintf('Sample var  : %.4f  (theoretical: %.4f)\n', var(X), pi^2/3))
+"></textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('p2')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('p2')">Clear</button>
+      <span class="run-status" id="st-p2"></span>
+    </div>
+    <div class="live-output" id="out-p2"></div>
+  </div>
+  <details>
+    <summary>▸ Show Answer — Logistic derivation &amp; R code</summary>
+    <div class="ans-wrap on" style="margin-top:.5rem">
+      <div class="ans-header">✓ Model Answer</div>
+      <div class="ans-code"><span class="ans-comment"># u = 1/(1+exp(-(x-mu)/s))  ⟹  exp(-(x-mu)/s) = (1-u)/u</span>
+<span class="ans-comment"># -(x-mu)/s = log((1-u)/u)  ⟹  x = mu + s*log(u/(1-u))</span>
+<span class="ans-comment"># F⁻¹(u) = mu + s * logit(u)  — the logit function!</span>
+
+mu &lt;- 0;  s &lt;- 1;  n &lt;- 5000
+set.seed(7)
+U &lt;- runif(n)
+X &lt;- mu + s * log(U / (1 - U))   <span class="ans-comment"># logit transform</span>
+
+cat(sprintf("Sample mean : %.4f  (theoretical: 0)\n",     mean(X)))
+cat(sprintf("Sample var  : %.4f  (theoretical: %.4f)\n",  var(X), pi^2/3))</div>
+    </div>
+  </details>
+
+  <div class="dist-header">
+    <span class="dist-badge">Free Sandbox</span>
+    <span class="dist-title">Any Distribution</span>
+    <span class="dist-formula">experiment freely</span>
+  </div>
+  <p>Pre-loaded with <strong>Rayleigh(σ=2)</strong>. Replace with any distribution you like — the full R engine is available.</p>
+  <div class="live-block">
+    <div class="live-topbar"><span class="live-dot dot-r"></span><span class="live-dot dot-y"></span><span class="live-dot dot-g"></span><span class="live-filename">sandbox.R</span></div>
+    <textarea class="live-editor" id="ed-sb" rows="12">
+# ── Rayleigh(sigma = 2) ────────────────────────────────────
+# f(x) = (x/sigma^2) * exp(-x^2/(2*sigma^2)),  x >= 0
+# F(x) = 1 - exp(-x^2/(2*sigma^2))
+# Invert: x^2 = -2*sigma^2*ln(1-u)
+# F⁻¹(u) = sigma * sqrt(-2 * log(1 - u))
+
+set.seed(1)
+sigma <- 2;  n <- 5000
+U <- runif(n)
+X <- sigma * sqrt(-2 * log(1 - U))
+
+cat(sprintf("Theoretical mean : %.4f  (= sigma*sqrt(pi/2))\n", sigma*sqrt(pi/2)))
+cat(sprintf("Sample mean      : %.4f\n", mean(X)))
+cat(sprintf("Theoretical var  : %.4f  (= sigma^2*(4-pi)/2)\n", sigma^2*(4-pi)/2))
+cat(sprintf("Sample variance  : %.4f\n", var(X)))
+</textarea>
+    <div class="live-ctrlbar">
+      <button class="run-btn" onclick="runBlock('sb')">▶ Run</button>
+      <button class="clr-btn" onclick="clearBlock('sb')">Clear</button>
+      <span class="run-status" id="st-sb"></span>
+    </div>
+    <div class="live-output" id="out-sb"></div>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="sum-stat"><div class="num gold" id="s-run">0</div><div class="lbl">Blocks Run</div></div>
+  <div class="sum-stat"><div class="num teal" id="s-dist">6</div><div class="lbl">Distributions</div></div>
+  <div class="sum-stat"><div class="num violet" id="s-ok">0</div><div class="lbl">Successful</div></div>
+</div>
+
+</div><!-- /page -->
+
+<script type="module">
+import { WebR } from 'https://webr.r-wasm.org/latest/webr.mjs';
+
+const wr = new WebR();
+await wr.init();
+
+// Set webr::canvas as default graphics device
+await wr.evalRVoid(`options(device = webr::canvas)`);
+
+window._wr = wr;
+document.getElementById('init-bar').style.display = 'none';
+const rb = document.getElementById('ready-bar');
+rb.style.display = 'flex';
+setTimeout(() => { rb.style.opacity = '0'; setTimeout(() => rb.style.display = 'none', 500); }, 2200);
+
+let runCount = 0, okCount = 0;
+const TOTAL = 9;
+
+// ── Shared shelter for all evaluations ──────────────────────
+const shelter = await new wr.Shelter();
+
+// ── Helper: run R code, return { text, images } ─────────────
+async function captureR(code) {
+  const capture = await shelter.captureR(code, {
+    withAutoprint: true,
+    captureGraphics: true
+  });
+
+  // Collect text output
+  const text = capture.output
+    .filter(o => o.type === 'stdout' || o.type === 'stderr')
+    .map(o => o.data)
+    .join('');
+
+  return { text, images: capture.images || [] };
+}
+
+// ── Render images into a plot-area div ───────────────────────
+function renderImages(images, plotAreaId) {
+  const area = document.getElementById(plotAreaId);
+  if (!area) return;
+  area.innerHTML = '';
+  if (images.length === 0) return;
+  images.forEach(img => {
+    const cvs = document.createElement('canvas');
+    // WebR uses 2× scaling for retina — display at device size
+    cvs.style.width  = img.width  / 2 + 'px';
+    cvs.style.height = img.height / 2 + 'px';
+    cvs.width  = img.width;
+    cvs.height = img.height;
+    cvs.getContext('2d').drawImage(img, 0, 0);
+    area.appendChild(cvs);
+  });
+  area.classList.add('on');
+}
+
+// ── Public: plain text block ─────────────────────────────────
+window.runBlock = async function(id) {
+  const code   = document.getElementById(`ed-${id}`).value.trim();
+  const outEl  = document.getElementById(`out-${id}`);
+  const statEl = document.getElementById(`st-${id}`);
+  const btn    = document.querySelector(`[onclick="runBlock('${id}')"]`);
+  if (!code) return;
+
+  btn.disabled = true; btn.textContent = '⟳ Running…';
+  outEl.classList.add('on');
+  outEl.innerHTML = '<span class="out-warn">Executing in R…</span>';
+  statEl.textContent = ''; statEl.className = 'run-status run';
+
+  try {
+    const { text } = await captureR(code);
+    const isErr = /^Error/m.test(text);
+    outEl.innerHTML = `<span class="${isErr ? 'out-err' : 'out-ok'}">${esc(text || '(code ran — no visible output)')}</span>`;
+    statEl.textContent = isErr ? '✗ error' : '✓ ok';
+    statEl.className = `run-status ${isErr ? 'err' : 'ok'}`;
+    if (!isErr) okCount++;
+  } catch(e) {
+    outEl.innerHTML = `<span class="out-err">${esc('Error: ' + (e.message || e))}</span>`;
+    statEl.textContent = '✗ error'; statEl.className = 'run-status err';
+  }
+  btn.disabled = false; btn.innerHTML = '▶ Run';
+  bump();
+};
+
+// ── Public: plot block ───────────────────────────────────────
+window.runPlot = async function(id, canvasId) {
+  const code   = document.getElementById(`ed-${id}`).value.trim();
+  const outEl  = document.getElementById(`out-${id}`);
+  const statEl = document.getElementById(`st-${id}`);
+  const btn    = document.querySelector(`[onclick="runPlot('${id}','${canvasId}')"]`);
+  if (!code) return;
+
+  btn.disabled = true; btn.textContent = '⟳ Rendering…';
+  outEl.classList.add('on');
+  outEl.innerHTML = '<span class="out-warn">Rendering plot…</span>';
+  statEl.textContent = ''; statEl.className = 'run-status run';
+
+  try {
+    const { text, images } = await captureR(code);
+    const isErr = /^Error/m.test(text);
+
+    // Show images
+    if (images.length > 0) {
+      renderImages(images, canvasId);
+      outEl.classList.remove('on');   // hide text panel if plot succeeded
+    }
+    // Show text only if there's something meaningful (errors, warnings)
+    if (text.trim()) {
+      outEl.classList.add('on');
+      outEl.innerHTML = `<span class="${isErr ? 'out-err' : 'out-ok'}">${esc(text)}</span>`;
+    }
+
+    statEl.textContent = isErr ? '✗ error' : images.length > 0 ? '✓ plotted' : '✓ ok';
+    statEl.className = `run-status ${isErr ? 'err' : 'ok'}`;
+    if (!isErr) okCount++;
+  } catch(e) {
+    outEl.innerHTML = `<span class="out-err">${esc('Error: ' + (e.message || e))}</span>`;
+    statEl.textContent = '✗ error'; statEl.className = 'run-status err';
+  }
+  btn.disabled = false; btn.innerHTML = '▶ Run &amp; Plot';
+  bump();
+};
+
+window.clearBlock = function(id) {
+  const o = document.getElementById(`out-${id}`);
+  o.classList.remove('on'); o.innerHTML = '';
+  document.getElementById(`st-${id}`).textContent = '';
+};
+window.clearPlot = function(id, canvasId) {
+  window.clearBlock(id);
+  const p = document.getElementById(canvasId);
+  if (p) { p.classList.remove('on'); p.innerHTML = ''; }
+};
+
+function bump() {
+  runCount++;
+  document.getElementById('s-run').textContent = runCount;
+  document.getElementById('s-ok').textContent  = okCount;
+  const pct = Math.min(runCount / TOTAL * 100, 100);
+  document.getElementById('pnav-fill').style.width = pct + '%';
+  document.getElementById('pnav-count').textContent = `${Math.min(runCount, TOTAL)} / ${TOTAL}`;
+}
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Tab key support in editors
+document.querySelectorAll('textarea.live-editor').forEach(t => {
+  t.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = t.selectionStart;
+      t.value = t.value.slice(0, s) + '  ' + t.value.slice(t.selectionEnd);
+      t.selectionStart = t.selectionEnd = s + 2;
+    }
+  });
+});
+</script>
+</body>
+</html>

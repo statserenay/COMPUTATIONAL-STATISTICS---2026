@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S361 · Question Bank · RVG Methods</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0e0f14;
+  --bg2:       #13151d;
+  --bg3:       #1a1d28;
+  --bg4:       #21253a;
+  --panel:     #181b26;
+  --border:    #2a2e44;
+  --border2:   #353a58;
+  --navy:      #1e3a6e;
+  --gold:      #e8b84b;
+  --gold2:     #f5d06a;
+  --gold-dim:  #7a5e1a;
+  --teal:      #2dd4bf;
+  --teal-dim:  #0d6659;
+  --rose:      #f87171;
+  --rose-dim:  #7f1d1d;
+  --mint:      #4ade80;
+  --mint-dim:  #14532d;
+  --violet:    #a78bfa;
+  --violet-dim:#3b0764;
+  --amber:     #fbbf24;
+  --sky:       #38bdf8;
+  --text:      #e2e4f0;
+  --text2:     #9ba3c0;
+  --text3:     #5c6484;
+  --serif:     'DM Serif Display', Georgia, serif;
+  --sans:      'DM Sans', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', monospace;
+  --r1: 12px; --r2: 16px; --r3: 24px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family:      var(--sans);
+  background-color: var(--bg);
+  color:            var(--text);
+  min-height:       100vh;
+  line-height:      1.65;
+}
+
+/* ─── HERO ──────────────────────────────── */
+.hero {
+  background:  linear-gradient(135deg, #0a1628 0%, #111827 40%, #0e1a35 100%);
+  padding:     4.5rem 2rem 3.5rem;
+  text-align:  center;
+  position:    relative;
+  overflow:    hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(232,184,75,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 30%, rgba(45,212,191,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-tag {
+  font-family:    var(--mono);
+  font-size:      0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  margin-bottom:  1rem;
+  position: relative;
+}
+.hero h1 {
+  font-family:    var(--serif);
+  font-size:      clamp(2rem, 5vw, 3.2rem);
+  color:          #fff;
+  line-height:    1.15;
+  margin-bottom:  0.6rem;
+  position: relative;
+}
+.hero h1 span { color: var(--gold); }
+.hero-sub {
+  font-size:   1rem;
+  color:       var(--text2);
+  max-width:   520px;
+  margin:      0 auto 2rem;
+  position: relative;
+}
+
+/* stats row */
+.stats {
+  display:         flex;
+  justify-content: center;
+  gap:             1.5rem;
+  flex-wrap:       wrap;
+  position: relative;
+}
+.stat-pill {
+  background:  rgba(255,255,255,0.05);
+  border:      1px solid var(--border);
+  border-radius: 999px;
+  padding:     0.4rem 1.1rem;
+  font-family: var(--mono);
+  font-size:   0.75rem;
+  color:       var(--text2);
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+}
+.stat-pill strong { color: var(--text); }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot-tf     { background: var(--teal); }
+.dot-mc     { background: var(--violet); }
+.dot-fill   { background: var(--amber); }
+.dot-open   { background: var(--rose); }
+
+/* ─── CONTROLS ──────────────────────────── */
+.controls {
+  background:  var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding:     1rem 2rem;
+  display:     flex;
+  flex-wrap:   wrap;
+  gap:         0.75rem;
+  align-items: center;
+  justify-content: center;
+  position:    sticky;
+  top:         0;
+  z-index:     100;
+  backdrop-filter: blur(12px);
+}
+.filter-btn {
+  background:  var(--bg3);
+  border:      1px solid var(--border);
+  border-radius: 999px;
+  padding:     0.38rem 1rem;
+  font-family: var(--mono);
+  font-size:   0.72rem;
+  letter-spacing: 0.06em;
+  color:       var(--text2);
+  cursor:      pointer;
+  transition:  all 0.18s;
+  display:     flex; align-items: center; gap: 0.4rem;
+}
+.filter-btn:hover { border-color: var(--border2); color: var(--text); }
+.filter-btn.active { background: var(--gold); border-color: var(--gold); color: #0e0f14; font-weight: 600; }
+.filter-btn.active-tf     { background: var(--teal);   border-color: var(--teal);   color: #0e0f14; }
+.filter-btn.active-mc     { background: var(--violet); border-color: var(--violet); color: #0e0f14; }
+.filter-btn.active-fill   { background: var(--amber);  border-color: var(--amber);  color: #0e0f14; }
+.filter-btn.active-open   { background: var(--rose);   border-color: var(--rose);   color: #0e0f14; }
+
+.progress-bar-wrap {
+  flex-basis: 100%;
+  height:     3px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow:   hidden;
+  margin-top: 0.25rem;
+}
+.progress-bar {
+  height:     100%;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  width:      0%;
+}
+
+/* ─── MAIN ──────────────────────────────── */
+main {
+  max-width:  960px;
+  margin:     0 auto;
+  padding:    2.5rem 1.5rem 5rem;
+}
+
+/* section label */
+.section-label {
+  font-family:    var(--mono);
+  font-size:      0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color:          var(--text3);
+  margin:         3rem 0 1.2rem;
+  display:        flex;
+  align-items:    center;
+  gap:            0.8rem;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* ─── QUESTION CARD ─────────────────────── */
+.q-card {
+  background:    var(--panel);
+  border:        1px solid var(--border);
+  border-radius: var(--r2);
+  margin-bottom: 1rem;
+  overflow:      hidden;
+  transition:    border-color 0.2s, transform 0.15s;
+  animation:     fadeUp 0.35s ease both;
+}
+.q-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.q-card.answered-correct { border-color: var(--mint-dim); background: linear-gradient(to right, rgba(74,222,128,0.04), var(--panel)); }
+.q-card.answered-wrong   { border-color: var(--rose-dim);  background: linear-gradient(to right, rgba(248,113,113,0.04), var(--panel)); }
+.q-card.revealed         { border-color: var(--gold-dim); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.q-header {
+  padding:     1rem 1.3rem 0.85rem;
+  display:     flex;
+  align-items: flex-start;
+  gap:         0.9rem;
+}
+.q-badge {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size:   0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding:     0.22rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  margin-top:  0.1rem;
+}
+.badge-tf   { background: rgba(45,212,191,0.15); color: var(--teal);   border: 1px solid rgba(45,212,191,0.3); }
+.badge-mc   { background: rgba(167,139,250,0.15); color: var(--violet); border: 1px solid rgba(167,139,250,0.3); }
+.badge-fill { background: rgba(251,191,36,0.15);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.3); }
+.badge-open { background: rgba(248,113,113,0.15);  color: var(--rose);   border: 1px solid rgba(248,113,113,0.3); }
+
+.q-num {
+  font-family: var(--mono);
+  font-size:   0.68rem;
+  color:       var(--text3);
+  margin-top:  0.25rem;
+  flex-shrink: 0;
+}
+.q-text {
+  font-size:   0.97rem;
+  color:       var(--text);
+  flex: 1;
+  line-height: 1.6;
+}
+.q-text strong { color: var(--gold); }
+
+/* code inline */
+.q-text code, .opt-label code, .answer-box code {
+  font-family:  var(--mono);
+  font-size:    0.82em;
+  background:   var(--bg4);
+  color:        var(--sky);
+  padding:      0.1em 0.4em;
+  border-radius: 4px;
+  border:       1px solid var(--border);
+}
+
+/* code block */
+.code-block {
+  background:   var(--bg);
+  border:       1px solid var(--border);
+  border-radius: var(--r1);
+  padding:      1rem 1.2rem;
+  margin:       0.8rem 1.3rem;
+  font-family:  var(--mono);
+  font-size:    0.80rem;
+  color:        #a8c8f0;
+  line-height:  1.7;
+  white-space:  pre;
+  overflow-x:   auto;
+}
+.code-block .kw  { color: #c8a8f0; }
+.code-block .fn  { color: #82aaff; }
+.code-block .str { color: #a8e4a0; }
+.code-block .num { color: #ffcb8e; }
+.code-block .cmt { color: #546e87; font-style: italic; }
+.code-block .op  { color: #89ddff; }
+
+/* ─── OPTIONS (MC + TF) ─────────────────── */
+.opts {
+  padding:     0 1.3rem 1rem;
+  display:     flex;
+  flex-direction: column;
+  gap:         0.45rem;
+}
+.opt {
+  display:     flex;
+  align-items: flex-start;
+  gap:         0.65rem;
+  padding:     0.65rem 0.9rem;
+  border:      1px solid var(--border);
+  border-radius: var(--r1);
+  background:  var(--bg3);
+  cursor:      pointer;
+  transition:  all 0.16s;
+  font-size:   0.91rem;
+}
+.opt:hover { border-color: var(--border2); background: var(--bg4); }
+.opt.selected { border-color: var(--violet); background: rgba(167,139,250,0.08); }
+.opt.correct  { border-color: var(--mint); background: rgba(74,222,128,0.09); }
+.opt.wrong    { border-color: var(--rose); background: rgba(248,113,113,0.09); }
+.opt-key {
+  font-family:  var(--mono);
+  font-size:    0.72rem;
+  font-weight:  600;
+  color:        var(--text3);
+  background:   var(--bg4);
+  border:       1px solid var(--border);
+  border-radius: 6px;
+  padding:      0.1em 0.5em;
+  flex-shrink:  0;
+  margin-top:   0.1rem;
+  transition:   all 0.16s;
+}
+.opt.selected .opt-key { background: var(--violet); border-color: var(--violet); color: #fff; }
+.opt.correct .opt-key  { background: var(--mint);   border-color: var(--mint);   color: #0e0f14; }
+.opt.wrong .opt-key    { background: var(--rose);   border-color: var(--rose);   color: #fff; }
+.opt-label { flex: 1; color: var(--text2); line-height: 1.5; }
+.opt.selected .opt-label, .opt.correct .opt-label, .opt.wrong .opt-label { color: var(--text); }
+
+/* tf buttons */
+.tf-wrap {
+  padding:    0 1.3rem 1rem;
+  display:    flex;
+  gap:        0.75rem;
+}
+.tf-btn {
+  flex:         1;
+  padding:      0.65rem;
+  border-radius: var(--r1);
+  border:       1px solid var(--border);
+  background:   var(--bg3);
+  color:        var(--text2);
+  font-family:  var(--mono);
+  font-size:    0.82rem;
+  font-weight:  600;
+  letter-spacing: 0.06em;
+  cursor:       pointer;
+  transition:   all 0.16s;
+  text-align:   center;
+}
+.tf-btn:hover    { border-color: var(--border2); color: var(--text); }
+.tf-btn.selected { border-color: var(--violet); background: rgba(167,139,250,0.12); color: var(--violet); }
+.tf-btn.correct  { border-color: var(--mint);   background: rgba(74,222,128,0.12);  color: var(--mint); }
+.tf-btn.wrong    { border-color: var(--rose);   background: rgba(248,113,113,0.12); color: var(--rose); }
+
+/* fill in blank */
+.fill-wrap {
+  padding:    0 1.3rem 1rem;
+}
+.fill-input {
+  width:        100%;
+  background:   var(--bg3);
+  border:       1px solid var(--border);
+  border-radius: var(--r1);
+  padding:      0.7rem 1rem;
+  font-family:  var(--mono);
+  font-size:    0.88rem;
+  color:        var(--text);
+  outline:      none;
+  transition:   border-color 0.16s;
+}
+.fill-input:focus  { border-color: var(--amber); }
+.fill-input.correct { border-color: var(--mint); background: rgba(74,222,128,0.06); }
+.fill-input.wrong   { border-color: var(--rose); background: rgba(248,113,113,0.06); }
+.fill-input::placeholder { color: var(--text3); }
+
+/* ─── ACTION ROW ────────────────────────── */
+.q-footer {
+  padding:     0 1.3rem 1rem;
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+}
+.btn-check {
+  background:  var(--gold);
+  border:      none;
+  border-radius: var(--r1);
+  padding:     0.5rem 1.2rem;
+  font-family: var(--mono);
+  font-size:   0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color:       #0e0f14;
+  cursor:      pointer;
+  transition:  all 0.16s;
+}
+.btn-check:hover { background: var(--gold2); transform: translateY(-1px); }
+.btn-reveal {
+  background:  transparent;
+  border:      1px solid var(--border);
+  border-radius: var(--r1);
+  padding:     0.5rem 1rem;
+  font-family: var(--mono);
+  font-size:   0.72rem;
+  color:       var(--text3);
+  cursor:      pointer;
+  transition:  all 0.16s;
+}
+.btn-reveal:hover { border-color: var(--border2); color: var(--text2); }
+.q-result {
+  font-family: var(--mono);
+  font-size:   0.75rem;
+  font-weight: 600;
+  padding:     0.3rem 0.7rem;
+  border-radius: 999px;
+}
+.q-result.ok  { background: rgba(74,222,128,0.15); color: var(--mint);  border: 1px solid rgba(74,222,128,0.3); }
+.q-result.bad { background: rgba(248,113,113,0.15); color: var(--rose);  border: 1px solid rgba(248,113,113,0.3); }
+
+/* ─── ANSWER BOX ────────────────────────── */
+.answer-box {
+  margin:       0 1.3rem 1.2rem;
+  background:   rgba(232,184,75,0.06);
+  border:       1px solid var(--gold-dim);
+  border-radius: var(--r1);
+  padding:      1rem 1.2rem;
+  font-size:    0.88rem;
+  color:        var(--text2);
+  line-height:  1.7;
+  display:      none;
+}
+.answer-box.show { display: block; }
+.answer-box .ans-label {
+  font-family:    var(--mono);
+  font-size:      0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  margin-bottom:  0.5rem;
+  display:        block;
+}
+.answer-box strong { color: var(--gold2); }
+
+/* open-ended hint */
+.hint-box {
+  margin:       0 1.3rem 1.2rem;
+  background:   rgba(56,189,248,0.05);
+  border:       1px solid rgba(56,189,248,0.2);
+  border-radius: var(--r1);
+  padding:      0.9rem 1.1rem;
+  font-size:    0.85rem;
+  color:        var(--text2);
+  line-height:  1.65;
+  display:      none;
+}
+.hint-box.show { display: block; }
+.hint-box .hint-label {
+  font-family:    var(--mono);
+  font-size:      0.62rem;
+  letter-spacing: 0.16em;
+  color:          var(--sky);
+  margin-bottom:  0.4rem;
+  display:        block;
+}
+
+/* ─── SCOREBOARD ────────────────────────── */
+.scoreboard {
+  background:    var(--panel);
+  border:        1px solid var(--border);
+  border-radius: var(--r2);
+  padding:       1.5rem 1.8rem;
+  margin-bottom: 2rem;
+  display:       flex;
+  flex-wrap:     wrap;
+  gap:           1.5rem;
+  align-items:   center;
+  justify-content: space-between;
+}
+.score-item { text-align: center; }
+.score-val {
+  font-family: var(--serif);
+  font-size:   2rem;
+  color:       var(--gold);
+  line-height: 1;
+}
+.score-lbl {
+  font-family: var(--mono);
+  font-size:   0.62rem;
+  letter-spacing: 0.14em;
+  color:       var(--text3);
+  text-transform: uppercase;
+  margin-top:  0.2rem;
+}
+
+/* ─── EMPTY STATE ───────────────────────── */
+.empty {
+  text-align:  center;
+  padding:     4rem 2rem;
+  color:       var(--text3);
+  font-family: var(--mono);
+  font-size:   0.82rem;
+}
+
+/* ─── SCROLLBAR ─────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ─── RESPONSIVE ────────────────────────── */
+@media (max-width: 600px) {
+  .hero { padding: 3rem 1.2rem 2.5rem; }
+  main  { padding: 1.5rem 1rem 3rem; }
+  .controls { padding: 0.8rem 1rem; }
+  .stats { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">S361 · Simulation & Statistical Computing</div>
+  <h1>R Programming <span>Question Bank</span></h1>
+  <p class="hero-sub">Methods for Generating Random Variables — Inverse Transform, Acceptance-Rejection, Transformation Methods, Sums & Mixtures</p>
+  <div class="stats">
+    <div class="stat-pill"><span class="dot dot-tf"></span>True/False <strong id="count-tf">0</strong></div>
+    <div class="stat-pill"><span class="dot dot-mc"></span>Multiple Choice <strong id="count-mc">0</strong></div>
+    <div class="stat-pill"><span class="dot dot-fill"></span>Fill in Blanks <strong id="count-fill">0</strong></div>
+    <div class="stat-pill"><span class="dot dot-open"></span>Open-Ended <strong id="count-open">0</strong></div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="filter-btn active" data-filter="all">All Questions</button>
+  <button class="filter-btn" data-filter="tf">T / F</button>
+  <button class="filter-btn" data-filter="mc">Multiple Choice</button>
+  <button class="filter-btn" data-filter="fill">Fill in Blanks</button>
+  <button class="filter-btn" data-filter="open">Open-Ended</button>
+  <button class="filter-btn" id="resetBtn">↺ Reset All</button>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <div class="scoreboard">
+    <div class="score-item"><div class="score-val" id="scoreCorrect">0</div><div class="score-lbl">Correct</div></div>
+    <div class="score-item"><div class="score-val" id="scoreWrong">0</div><div class="score-lbl">Wrong</div></div>
+    <div class="score-item"><div class="score-val" id="scoreRevealed">0</div><div class="score-lbl">Revealed</div></div>
+    <div class="score-item"><div class="score-val" id="scoreTotal">0</div><div class="score-lbl">Answered</div></div>
+    <div class="score-item"><div class="score-val" id="scorePct">—</div><div class="score-lbl">Accuracy</div></div>
+  </div>
+  <div id="questionContainer"></div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  QUESTION DATA
+// ═══════════════════════════════════════════════════
+const questions = [
+
+// ───────────────────────────────────────────────────
+//  TRUE / FALSE
+// ───────────────────────────────────────────────────
+{type:'tf', topic:'ITM',
+ q:`The Inverse Transform Method requires the CDF of the target distribution to be invertible.`,
+ answer:'TRUE', explanation:`The ITM works by solving F(X) = U, which requires F to be invertible. If F⁻¹ doesn't exist in closed form, ITM cannot be applied directly.`},
+
+{type:'tf', topic:'ITM',
+ q:`If U ~ Unif(0,1), then –(1/λ)·log(U) ~ Exponential(λ).`,
+ answer:'TRUE', explanation:`For Exp(λ) the CDF is F(x) = 1 – e^(–λx). Solving U = 1 – e^(–λx) gives x = –(1/λ)log(1–U). Since 1–U ~ Unif(0,1), we can equivalently write x = –(1/λ)log(U).`},
+
+{type:'tf', topic:'ITM',
+ q:`In R, <code>runif(n)</code> generates n values from Uniform(0,1), which can be directly used as the input U in the Inverse Transform Method.`,
+ answer:'TRUE', explanation:`runif(n) produces iid Unif(0,1) samples — exactly the uniform random numbers required by the ITM.`},
+
+{type:'tf', topic:'A-R',
+ q:`In the Acceptance-Rejection method, the constant c must satisfy f(x) ≥ c·g(x) for all x.`,
+ answer:'FALSE', explanation:`The correct condition is f(x) ≤ c·g(x), meaning c·g(x) acts as an envelope that always lies above or touches f(x).`},
+
+{type:'tf', topic:'A-R',
+ q:`The acceptance probability in the A-R algorithm is always equal to 1/c.`,
+ answer:'TRUE', explanation:`P(accept) = E[f(Y)/(c·g(Y))] = (1/c)∫f(y)dy = 1/c. This is a fundamental theorem of the A-R method.`},
+
+{type:'tf', topic:'A-R',
+ q:`The number of iterations N needed to obtain one accepted sample from the A-R algorithm follows a Geometric(p = c) distribution.`,
+ answer:'FALSE', explanation:`N ~ Geometric(p = 1/c), not Geometric(c). The acceptance probability is 1/c, which is the success probability of the geometric.`},
+
+{type:'tf', topic:'A-R',
+ q:`A smaller value of c in the A-R method leads to better computational efficiency.`,
+ answer:'TRUE', explanation:`Since E[N] = c, a smaller c means fewer iterations on average are needed to obtain one accepted sample.`},
+
+{type:'tf', topic:'A-R',
+ q:`The optimal value of c is c = sup_x [g(x)/f(x)].`,
+ answer:'FALSE', explanation:`The optimal c = sup_x [f(x)/g(x)], which is the maximum ratio of target to proposal density.`},
+
+{type:'tf', topic:'A-R',
+ q:`In R, the code <code>U &lt; f(Y)/(c*g(Y))</code> correctly implements the acceptance step of the A-R algorithm.`,
+ answer:'TRUE', explanation:`This is the standard acceptance condition: accept Y if U < f(Y)/(c·g(Y)).`},
+
+{type:'tf', topic:'A-R',
+ q:`The Acceptance-Rejection method requires a closed-form expression for the CDF of f(x).`,
+ answer:'FALSE', explanation:`One of the key advantages of A-R sampling is that only evaluations of f(x) (not its CDF) are needed. No invertible CDF is required.`},
+
+{type:'tf', topic:'Transformation',
+ q:`If Z ~ N(0,1), then V = Z² ~ χ²(1).`,
+ answer:'TRUE', explanation:`This is a fundamental result: the square of a standard normal is chi-squared with 1 degree of freedom.`},
+
+{type:'tf', topic:'Transformation',
+ q:`The Box-Muller transform uses two independent Uniform(0,1) random variables to generate two independent standard normal variables.`,
+ answer:'TRUE', explanation:`Z₁ = √(–2log U)·cos(2πV) and Z₂ = √(–2log V)·sin(2πU) are independent N(0,1).`},
+
+{type:'tf', topic:'Transformation',
+ q:`If U ~ Gamma(r,λ) and V ~ Gamma(s,λ) are independent, then X = U/(U+V) ~ Beta(r,s).`,
+ answer:'TRUE', explanation:`This is the ratio-of-gamma transformation for generating Beta random variables, covered directly in the lecture notes.`},
+
+{type:'tf', topic:'Transformation',
+ q:`The t(n) distribution can be generated by taking Z/√(Y/n) where Z ~ N(0,1) and Y ~ χ²(n) are independent.`,
+ answer:'TRUE', explanation:`T = Z/√(V/n) where Z ~ N(0,1) and V ~ χ²(n) are independent gives T ~ t(n).`},
+
+{type:'tf', topic:'Sums&Mixtures',
+ q:`The distribution function of a sum S = X₁+…+Xₙ of iid random variables is called the n-fold convolution of X.`,
+ answer:'TRUE', explanation:`This is the definition of convolution given in the lecture notes, denoted F_X^(*n).`},
+
+{type:'tf', topic:'Sums&Mixtures',
+ q:`A mixture of two normal distributions is always normal.`,
+ answer:'FALSE', explanation:`A mixture of two normals is generally non-normal; for example, a 50% mixture of N(0,1) and N(3,1) produces a bimodal distribution.`},
+
+{type:'tf', topic:'Sums&Mixtures',
+ q:`NegBin(r,p) can be generated as the convolution of r iid Geom(p) random variables.`,
+ answer:'TRUE', explanation:`This is stated directly in the lecture notes as an example of convolution.`},
+
+{type:'tf', topic:'Sums&Mixtures',
+ q:`In the discrete mixture F_X(x) = Σθᵢ·F_Xᵢ(x), the mixing weights θᵢ must satisfy θᵢ > 0 and Σθᵢ = 1.`,
+ answer:'TRUE', explanation:`These are the required conditions for valid mixing weights (they form a proper probability distribution).`},
+
+{type:'tf', topic:'R',
+ q:`In R, <code>rowSums(X)</code> is equivalent to <code>apply(X, 1, sum)</code>.`,
+ answer:'TRUE', explanation:`Both compute row sums of matrix X. rowSums is a faster specialized function; apply with MARGIN=1 and FUN=sum is the general approach.`},
+
+{type:'tf', topic:'R',
+ q:`The R function <code>tabulate(x)</code> can handle non-positive or non-integer values gracefully.`,
+ answer:'FALSE', explanation:`As stated in the lecture notes, tabulate bins positive integers only. It truncates real numbers and silently ignores integers less than 1.`},
+
+{type:'tf', topic:'R',
+ q:`<code>optimize(f, interval=c(0,1), maximum=TRUE)</code> returns the x-value and the maximum of f on [0,1].`,
+ answer:'TRUE', explanation:`optimize() with maximum=TRUE returns a list with $maximum (the x-value) and $objective (the maximum function value).`},
+
+{type:'tf', topic:'R',
+ q:`<code>par(mfcol=c(2,3))</code> creates a 2×3 grid with plots filled by row.`,
+ answer:'FALSE', explanation:`mfcol fills by column. To fill by row you would use mfrow. par(mfcol=c(2,3)) gives 6 panels arranged in 2 rows and 3 columns, filled column by column.`},
+
+{type:'tf', topic:'R',
+ q:`The R expression <code>x &lt;- matrix(rnorm(n*v), n, v)^2</code> creates an n×v matrix of squared standard normals.`,
+ answer:'TRUE', explanation:`rnorm(n*v) generates n·v standard normals, matrix() reshapes into n rows and v columns, and ^2 squares every element.`},
+
+{type:'tf', topic:'R',
+ q:`<code>sample(1:5, size=n, replace=TRUE, prob=(1:5)/15)</code> samples integers 1–5 with equal probability.`,
+ answer:'FALSE', explanation:`The prob argument (1:5)/15 = (1/15, 2/15, 3/15, 4/15, 5/15) gives unequal probabilities proportional to the index.`},
+
+{type:'tf', topic:'R',
+ q:`In R, <code>floor(x)</code> returns the integer part of x by truncating toward negative infinity.`,
+ answer:'TRUE', explanation:`floor() returns the largest integer not greater than x, which is rounding toward –∞. For x > 0, this equals the integer part.`},
+
+// ───────────────────────────────────────────────────
+//  MULTIPLE CHOICE
+// ───────────────────────────────────────────────────
+{type:'mc', topic:'ITM',
+ q:`To generate X ~ Exponential(λ) using the Inverse Transform Method, which formula should be used?`,
+ opts:['A. X = –λ·log(U)', 'B. X = –(1/λ)·log(U)', 'C. X = (1/λ)·log(U)', 'D. X = log(U)/λ²'],
+ answer:'B', explanation:`CDF is F(x) = 1 – e^(–λx). Setting U = F(X) and solving: X = –(1/λ)·log(1–U) = –(1/λ)·log(U) (since 1–U ~ Unif(0,1)).`},
+
+{type:'mc', topic:'ITM',
+ q:`Which R function correctly generates n samples from Geometric(p) using the ITM?`,
+ opts:['A. <code>ceiling(log(runif(n)) / log(1-p))</code>',
+       'B. <code>floor(log(runif(n)) / log(1-p))</code>',
+       'C. <code>-log(runif(n)) / p</code>',
+       'D. <code>ceiling(runif(n) / p)</code>'],
+ answer:'A', explanation:`For Geom(p), F⁻¹(u) = ⌈log(u)/log(1–p)⌉. In R: ceiling(log(runif(n)) / log(1-p)).`},
+
+{type:'mc', topic:'ITM',
+ q:`For the Weibull(k, λ) distribution with CDF F(x) = 1 – exp(–(λx)^k), the ITM gives:`,
+ opts:['A. X = λ⁻¹·(–log U)^(1/k)',
+       'B. X = λ·(–log U)^k',
+       'C. X = (–log U / λ)^(1/k)',
+       'D. X = –log(1–U)/λ^k'],
+ answer:'A', explanation:`Setting U = 1 – exp(–(λX)^k): –log(1–U) = (λX)^k → X = (–log(1–U))^(1/k)/λ = λ⁻¹·(–log U)^(1/k).`},
+
+{type:'mc', topic:'A-R',
+ q:`In the A-R algorithm, for target f(x) = 20x(1–x)³ on (0,1) with proposal g(x)=1, what is the optimal constant c?`,
+ opts:['A. 20', 'B. 135/64 ≈ 2.109', 'C. 256/27 ≈ 9.48', 'D. 5'],
+ answer:'B', explanation:`Maximizing f(x)/g(x) = 20x(1–x)³ at x = 0.25 gives 20·(0.25)·(0.75)³ = 20·(1/4)·(27/64) = 135/64.`},
+
+{type:'mc', topic:'A-R',
+ q:`If c = 4 in an A-R sampler, what is the expected number of uniform random pairs (U₁,U₂) needed to obtain 1000 accepted samples?`,
+ opts:['A. 250', 'B. 1000', 'C. 4000', 'D. 2000'],
+ answer:'C', explanation:`E[iterations per accepted sample] = c = 4. For 1000 accepted samples: 1000 × 4 = 4000.`},
+
+{type:'mc', topic:'A-R',
+ q:`Which of the following is the acceptance condition in the A-R method?`,
+ opts:['A. U > f(Y)/(c·g(Y))',
+       'B. U ≤ f(Y)/(c·g(Y))',
+       'C. Y ≤ f(U)/(c·g(U))',
+       'D. U ≤ g(Y)/(c·f(Y))'],
+ answer:'B', explanation:`Accept Y as a sample from f if U ≤ f(Y)/(c·g(Y)), where U ~ Unif(0,1) independent of Y.`},
+
+{type:'mc', topic:'A-R',
+ q:`For f(x) ∝ e^(κcos(x)) on (–π, π] (Von Mises) with proposal g(x) = 1/(2π), what is the constant c?`,
+ opts:['A. e^κ', 'B. 2π·e^κ', 'C. κ·e^κ', 'D. π·e^(2κ)'],
+ answer:'B', explanation:`f(x)/g(x) = 2π·e^(κcos(x)). The maximum is at x=0 where cos(0)=1, giving c = 2π·e^κ.`},
+
+{type:'mc', topic:'A-R',
+ q:`To generate Beta(a,b) samples using the A-R method with g(x) = Unif(0,1), what is c?`,
+ opts:['A. Γ(a+b)', 'B. Γ(a)·Γ(b)/Γ(a+b)', 'C. Γ(a+b)/(Γ(a)·Γ(b))', 'D. max(a,b)'],
+ answer:'C', explanation:`The ratio f(x)/g(x) = Γ(a+b)/(Γ(a)·Γ(b))·x^(a–1)·(1–x)^(b–1). Its maximum (at the mode) bounds the ratio, and c = Γ(a+b)/(Γ(a)·Γ(b)).`},
+
+{type:'mc', topic:'A-R',
+ q:`Which proposal distribution is generally preferred in the A-R method?`,
+ opts:['A. The one that is easiest to sample from, regardless of shape',
+       'B. The one with the smallest c and shape similar to f(x)',
+       'C. Always the Uniform distribution',
+       'D. The one with the largest support'],
+ answer:'B', explanation:`The ideal g(y) combines easy simulation with a small c (close to 1) by having a shape that closely matches f(x).`},
+
+{type:'mc', topic:'Transformation',
+ q:`Which R code correctly generates 1000 Beta(3,2) samples using the Gamma-ratio transformation?`,
+ opts:['A. <code>u &lt;- rgamma(n,3,1); v &lt;- rgamma(n,2,1); x &lt;- u/(u+v)</code>',
+       'B. <code>u &lt;- rgamma(n,3,1); v &lt;- rgamma(n,2,1); x &lt;- u*v</code>',
+       'C. <code>x &lt;- rbeta(n,3,2)</code> (only valid for direct method)',
+       'D. <code>u &lt;- rnorm(n); x &lt;- u^2/(u^2+1)</code>'],
+ answer:'A', explanation:`If U ~ Gamma(a,λ) and V ~ Gamma(b,λ) are independent, then X = U/(U+V) ~ Beta(a,b). Setting λ=1 is standard.`},
+
+{type:'mc', topic:'Transformation',
+ q:`What is the R code to generate 1000 χ²(5) random variables using the convolution method?`,
+ opts:['A. <code>x &lt;- rowSums(matrix(rnorm(1000*5), 1000, 5)^2)</code>',
+       'B. <code>x &lt;- rnorm(1000)^5</code>',
+       'C. <code>x &lt;- rowSums(matrix(runif(1000*5), 1000, 5)^2)</code>',
+       'D. <code>x &lt;- sum(rnorm(5)^2)</code>'],
+ answer:'A', explanation:`χ²(ν) is the sum of ν squared N(0,1) variables. matrix(rnorm(n*v),n,v)^2 creates the squared normals; rowSums computes the row sums.`},
+
+{type:'mc', topic:'Transformation',
+ q:`The Box-Muller formulas Z₁ = √(–2log U)·cos(2πV) and Z₂ = √(–2log V)·sin(2πU) produce which distributions?`,
+ opts:['A. Z₁ ~ N(0,1), Z₂ ~ Unif(0,1)',
+       'B. Both Z₁ and Z₂ ~ N(0,1), and they are independent',
+       'C. Z₁ and Z₂ ~ N(0,1), but they are correlated',
+       'D. Z₁ ~ N(0,1), Z₂ ~ Cauchy(0,1)'],
+ answer:'B', explanation:`Box-Muller produces two independent standard normal variables Z₁ and Z₂ from two independent Uniform(0,1) inputs.`},
+
+{type:'mc', topic:'Sums&Mixtures',
+ q:`In R, what does the following code simulate?<br><pre class="code-block" style="margin:0.7rem 0 0">u &lt;- runif(n)
+k &lt;- as.integer(u &gt; 0.5)
+x &lt;- k * x1 + (1-k) * x2</pre>`,
+ opts:['A. The convolution S = x1 + x2',
+       'B. A 50% discrete mixture: each sample drawn from either x1 or x2 with prob 0.5',
+       'C. A weighted average of x1 and x2',
+       'D. x1 scaled by x2'],
+ answer:'B', explanation:`k is a Bernoulli(0.5) indicator: when k=1 the sample comes from x1, when k=0 from x2. This implements the 50% mixture F_X = 0.5F_X1 + 0.5F_X2.`},
+
+{type:'mc', topic:'Sums&Mixtures',
+ q:`In the Poisson-Gamma mixture, if (X|Λ=λ)~Poisson(λ) and Λ~Gamma(r,β), the marginal distribution of X is:`,
+ opts:['A. Poisson(r·β)', 'B. Negative Binomial(r, β/(1+β))', 'C. Gamma(r,β)', 'D. Binomial(r,β)'],
+ answer:'B', explanation:`The Poisson-Gamma mixture yields a Negative Binomial distribution with parameters r and p = β/(1+β), as derived in the lecture notes.`},
+
+{type:'mc', topic:'R',
+ q:`What does <code>apply(X, 1, sum)</code> compute?`,
+ opts:['A. Column sums of X', 'B. Row sums of X',
+       'C. Element-wise sum of X', 'D. The sum of all elements in X'],
+ answer:'B', explanation:`MARGIN=1 means "apply across rows." With FUN=sum, each row is summed, producing a vector of row sums.`},
+
+{type:'mc', topic:'R',
+ q:`Which R code generates a sample of size n from the Logarithmic(θ) distribution using the transformation method?`,
+ opts:['A. <code>floor(1 + log(v)/log(1-(1-theta)^u))</code>',
+       'B. <code>floor(log(v)/log(1-theta))</code>',
+       'C. <code>ceiling(log(u)/log(theta))</code>',
+       'D. <code>round(log(u*v)/log(1-theta))</code>'],
+ answer:'A', explanation:`The transformation X = ⌊1 + log(V)/log(1–(1–θ)^U)⌋ where U,V ~ Unif(0,1) generates Logarithmic(θ) samples.`},
+
+{type:'mc', topic:'R',
+ q:`What does <code>par(mfcol=c(1,1))</code> accomplish after multiple plots?`,
+ opts:['A. Creates a new empty plot', 'B. Clears all plots',
+       'C. Restores the graphical device to single-plot display mode',
+       'D. Sets margins to zero'],
+ answer:'C', explanation:`par(mfcol=c(1,1)) resets the layout to show one plot per page, restoring the default single-plot display.`},
+
+{type:'mc', topic:'R',
+ q:`In the A-R loop for discrete case, the value c is computed as <code>max(probs)/(1/length(probs))</code>. For probs = c(0.15, 0.22, 0.33, 0.10, 0.20), what is c?`,
+ opts:['A. 0.33', 'B. 1.00', 'C. 1.65', 'D. 5.00'],
+ answer:'C', explanation:`max(probs) = 0.33, length(probs) = 5 → 1/5 = 0.2. Therefore c = 0.33/0.2 = 1.65.`},
+
+{type:'mc', topic:'R',
+ q:`Which function in R best verifies that a generated sample matches a target distribution?`,
+ opts:['A. <code>hist(x)</code> only',
+       'B. <code>qqplot()</code> comparing quantiles, or overlaying theoretical density on histogram',
+       'C. <code>mean(x)</code> alone',
+       'D. <code>table(x)</code>'],
+ answer:'B', explanation:`A QQ plot (qqplot) visually compares empirical vs. theoretical quantiles. Overlaying the theoretical density on a histogram also validates fit. A mean alone is insufficient.`},
+
+// ───────────────────────────────────────────────────
+//  FILL IN THE BLANKS
+// ───────────────────────────────────────────────────
+{type:'fill', topic:'ITM',
+ q:`The Inverse Transform Method states: if U ~ Unif(0,1) and F is the CDF of X, then X = __________ has distribution F.`,
+ answer:'F⁻¹(U)', explanation:`X = F⁻¹(U) — applying the inverse CDF (quantile function) to a uniform random variable gives the desired distribution.`},
+
+{type:'fill', topic:'ITM',
+ q:`To generate Uniform(a,b) using the ITM from U ~ Unif(0,1), use X = __________.`,
+ answer:'a + (b-a)*U', explanation:`F(x) = (x–a)/(b–a) → F⁻¹(u) = a + (b–a)u. In R: a + (b-a)*runif(n).`},
+
+{type:'fill', topic:'A-R',
+ q:`In the A-R algorithm, the probability of accepting a sample in any single iteration equals __________.`,
+ answer:'1/c', explanation:`P(accept) = 1/c is derived from the law of total probability: ∫f(y)/[c·g(y)]·g(y)dy = 1/c.`},
+
+{type:'fill', topic:'A-R',
+ q:`The number of iterations N needed to obtain one accepted sample follows N ~ __________.`,
+ answer:'Geometric(1/c)', explanation:`Each iteration is an independent Bernoulli trial with success probability 1/c, so N follows the Geometric distribution with p = 1/c.`},
+
+{type:'fill', topic:'A-R',
+ q:`In R, to find the maximum of f(x)/g(x) on [0,1], you would use: <code>optimize(fg, interval = c(0,1), maximum = __________)</code>`,
+ answer:'TRUE', explanation:`optimize() by default minimizes. Setting maximum=TRUE tells it to find the maximum instead.`},
+
+{type:'fill', topic:'A-R',
+ q:`For target f(x) = 3x² on [0,1] with g(x) = 1, the acceptance ratio f(x)/(c·g(x)) simplifies to __________.`,
+ answer:'x²', explanation:`c = max(3x²) = 3 at x=1. So f(x)/(c·g(x)) = 3x²/(3·1) = x².`},
+
+{type:'fill', topic:'Transformation',
+ q:`If U ~ Gamma(r,λ) and V ~ Gamma(s,λ) are independent, then X = U/(U+V) ~ __________.`,
+ answer:'Beta(r,s)', explanation:`This is the Gamma-ratio transformation for generating Beta random variables.`},
+
+{type:'fill', topic:'Transformation',
+ q:`In R, to generate 1000 Beta(3,2) samples using the transformation method: <code>u &lt;- rgamma(1000, shape=3, rate=1); v &lt;- rgamma(1000, shape=2, rate=1); x &lt;- __________</code>`,
+ answer:'u/(u+v)', explanation:`The formula X = U/(U+V) where U~Gamma(a,λ) and V~Gamma(b,λ) gives X~Beta(a,b).`},
+
+{type:'fill', topic:'Transformation',
+ q:`The Logarithmic(θ) random variable can be generated using: X = ⌊1 + log(V)/log(__________) ⌋ where U,V ~ Unif(0,1).`,
+ answer:'1-(1-theta)^U', explanation:`The full formula is X = ⌊1 + log(V)/log(1–(1–θ)^U)⌋. In R: floor(1 + log(v)/log(1-(1-theta)^u)).`},
+
+{type:'fill', topic:'Transformation',
+ q:`If Z ~ N(0,1) and Y ~ χ²(n) are independent, then T = Z/√(Y/n) ~ __________.`,
+ answer:'t(n)', explanation:`This is the definition of the Student's t-distribution with n degrees of freedom.`},
+
+{type:'fill', topic:'Sums&Mixtures',
+ q:`The convolution of r independent Exp(λ) random variables has __________ distribution.`,
+ answer:'Gamma(r,λ)', explanation:`Summing r iid Exponential(λ) random variables gives a Gamma(r,λ) distribution.`},
+
+{type:'fill', topic:'Sums&Mixtures',
+ q:`In R, to compute row sums of a matrix X you can write either <code>rowSums(X)</code> or <code>apply(X, __________, sum)</code>.`,
+ answer:'1', explanation:`MARGIN=1 applies the function to rows; MARGIN=2 would apply to columns.`},
+
+{type:'fill', topic:'Sums&Mixtures',
+ q:`For a discrete mixture F_X = Σθᵢ·F_Xᵢ, the mixing weights must satisfy θᵢ > 0 and Σθᵢ = __________.`,
+ answer:'1', explanation:`The mixing weights form a proper probability distribution and must sum to 1.`},
+
+{type:'fill', topic:'Sums&Mixtures',
+ q:`In the Poisson-Gamma mixture with Λ~Gamma(r,β), the marginal of X has a __________ distribution with p = β/(1+β).`,
+ answer:'Negative Binomial', explanation:`The Poisson-Gamma mixture yields a Negative Binomial (also called Pascal) distribution.`},
+
+{type:'fill', topic:'R',
+ q:`To generate chi-square(ν) samples using the convolution method in R: <code>y &lt;- rowSums(matrix(rnorm(n*v), __, v)^2)</code>. Fill in the blank.`,
+ answer:'n', explanation:`matrix(rnorm(n*v), n, v) creates an n×v matrix. Squaring and taking row sums gives n independent χ²(v) observations.`},
+
+{type:'fill', topic:'R',
+ q:`The R expression <code>as.integer(u &gt; 0.5)</code> where u ~ Unif(0,1) creates a vector of __________ with P(k=1) = 0.5.`,
+ answer:'0s and 1s', explanation:`u > 0.5 is a logical vector; as.integer() converts TRUE→1, FALSE→0. This creates Bernoulli(0.5) indicators.`},
+
+{type:'fill', topic:'R',
+ q:`In R, <code>ppoints(n)</code> returns __________ evenly spaced probability values used in QQ plots.`,
+ answer:'n', explanation:`ppoints(n) returns n values (i–0.375)/(n+0.25) for i=1,...,n, which are evenly spaced probabilities for QQ plotting.`},
+
+{type:'fill', topic:'R',
+ q:`The R code to plot the density of a mixture and its five gamma components begins: <code>plot(density(x), ...); for(i in 1:5) lines(density(rgamma(n, 3, __________)))</code>`,
+ answer:'1/i', explanation:`The five components have rates λ = (1, 1/2, 1/3, 1/4, 1/5) corresponding to rate=1/i for i=1,...,5.`},
+
+{type:'fill', topic:'R',
+ q:`To restore a single-plot display after <code>par(mfcol=c(1,2))</code>, write: <code>par(mfcol = __________)</code>`,
+ answer:'c(1,1)', explanation:`par(mfcol=c(1,1)) resets the graphics device to display one plot per frame.`},
+
+// ───────────────────────────────────────────────────
+//  OPEN-ENDED
+// ───────────────────────────────────────────────────
+{type:'open', topic:'ITM',
+ q:`<strong>Write complete R code</strong> to generate n = 5000 samples from X ~ Cauchy(x₀, γ) using the Inverse Transform Method, where the CDF is F(x) = 0.5 + arctan((x–x₀)/γ)/π. Use x₀ = 0, γ = 1. Then plot a density histogram and overlay the theoretical density.`,
+ hint:`The inverse CDF is F⁻¹(u) = x₀ + γ·tan(π·(u – 0.5)). In R: x0 + gamma * tan(pi * (runif(n) - 0.5)). For the density overlay use: curve(dcauchy(x, x0, gamma), add=TRUE, col="blue").`},
+
+{type:'open', topic:'ITM',
+ q:`<strong>Derive and implement</strong> the ITM for X ~ Pareto(α, x_m) where F(x) = 1 – (x_m/x)^α for x ≥ x_m. Write R code to generate n = 10000 samples with α = 2, x_m = 1. Validate by comparing the sample mean with the theoretical mean α·x_m/(α–1).`,
+ hint:`F⁻¹(u) = x_m·(1–u)^(–1/α) = x_m / (1–u)^(1/α). Since 1–U ~ Unif(0,1): x <- xm / runif(n)^(1/alpha). Theoretical mean = α·x_m/(α–1) = 2 for the given parameters.`},
+
+{type:'open', topic:'A-R',
+ q:`<strong>Implement</strong> an A-R sampler in R for the biweight (quartic) kernel density:<br>f(x) = (15/16)·(1–x²)², for x ∈ [–1,1].<br>Choose an appropriate proposal distribution. Compute c, the acceptance rate, and plot the results.`,
+ hint:`Use g(x) = 1/2 (Unif(–1,1)). Find c = max(f(x)/g(x)) = max(15/8·(1–x²)²) = 15/8 at x=0. Accept if U ≤ (1–x²)². Expected acceptance rate = 1/c = 8/15 ≈ 0.533.`},
+
+{type:'open', topic:'A-R',
+ q:`<strong>Write a function</strong> <code>rlaplace(n, mu, b)</code> that generates Laplace(μ, b) samples using the Inverse Transform Method. Then use this function as a building block in an A-R sampler to generate N(0,1) samples with λ = 1 (following the Laplace proposal approach from the lecture). Compare your samples to dnorm() using a density plot.`,
+ hint:`Laplace CDF: F(x) = 0.5·exp((x–μ)/b) if x ≤ μ, else 1 – 0.5·exp(–(x–μ)/b). Inverse: F⁻¹(u) = μ + b·log(2u) if u ≤ 0.5, else μ – b·log(2–2u). For A-R with λ=1: accept if U ≤ exp(–(|x|–1)²/2).`},
+
+{type:'open', topic:'A-R',
+ q:`<strong>Explain and implement</strong> an A-R sampler for f(x) = x²/9 on (0,3). After generating n=10000 samples: (1) compare the simulated mean, SD, and P(X<2) with theoretical values; (2) compute and report the rejection rate; (3) create a well-labeled density histogram with the theoretical curve overlaid.`,
+ hint:`c = max(f(x)/g(x)) where g(x)=1/3 for x∈(0,3) → max(f/g) = max(x²/3) = 3 at x=3. Theoretical mean = 9/4 = 2.25; theoretical variance = 27/80; P(X<2) = 8/27 ≈ 0.296.`},
+
+{type:'open', topic:'Transformation',
+ q:`<strong>Generate 1000 F(m,n) distributed random variables</strong> with m=5, n=10 using the transformation method in R (building from χ² variables). Verify by comparing the sample mean to the theoretical mean n/(n–2).`,
+ hint:`1. Generate U ~ χ²(m): U <- rowSums(matrix(rnorm(1000*m),1000,m)^2)\n2. Generate V ~ χ²(n): V <- rowSums(matrix(rnorm(1000*n),1000,n)^2)\n3. F <- (U/m)/(V/n)\nTheoretical mean = n/(n–2) = 10/8 = 1.25.`},
+
+{type:'open', topic:'Transformation',
+ q:`<strong>Write R code</strong> that generates 2000 standard normal samples using the Box-Muller transform from scratch (without using rnorm). Validate by plotting a histogram, overlaying the N(0,1) density, and checking the sample mean and variance.`,
+ hint:`u <- runif(2000); v <- runif(2000)\nz1 <- sqrt(-2*log(u)) * cos(2*pi*v)\nz2 <- sqrt(-2*log(v)) * sin(2*pi*u)\nz <- c(z1, z2)  # 4000 N(0,1) samples\nCompare mean(z) ≈ 0 and var(z) ≈ 1.`},
+
+{type:'open', topic:'Sums&Mixtures',
+ q:`<strong>Simulate and compare</strong> the convolution S = X₁+X₂ versus the mixture F_X = 0.5F_X₁ + 0.5F_X₂ where X₁ ~ Gamma(2,2) and X₂ ~ Gamma(2,4) with n = 1000. Plot side-by-side histograms and discuss the visual difference between the two distributions.`,
+ hint:`Convolution: S <- x1 + x2 (always positive, unimodal, broader)\nMixture: u <- runif(n); k <- as.integer(u > 0.5); x <- k*x1 + (1-k)*x2 (possibly bimodal). The convolution distributes the weight of both distributions uniformly while the mixture creates a "blend" of shapes.`},
+
+{type:'open', topic:'Sums&Mixtures',
+ q:`<strong>Implement the Poisson-Gamma mixture</strong> in R with r=4, β=3, n=1000. Compare the simulated probability mass function to the theoretical Negative Binomial(r=4, p=β/(1+β)=0.75) PMF. Compute a table showing p̂_k, p_k, and the standard error se_k for each value k.`,
+ hint:`lambda <- rgamma(n, r, beta)  # random Poisson means\nx <- rpois(n, lambda)           # Poisson sample\nmix <- tabulate(x+1)/n\nnegbin <- dnbinom(0:max(x), r, beta/(1+beta))\nse <- sqrt(negbin*(1-negbin)/n)\nround(rbind(mix, negbin, se), 3)`},
+
+{type:'open', topic:'Sums&Mixtures',
+ q:`<strong>Write a vectorized R function</strong> that generates n samples from the mixture F_X = Σⱼθⱼ·F_Xⱼ where Xⱼ ~ Gamma(3, λⱼ) with λ = (1, 1.5, 2, 2.5, 3) and θ = (0.1, 0.2, 0.2, 0.3, 0.2). Plot the mixture density alongside each component density.`,
+ hint:`k <- sample(1:5, n, TRUE, p)\nrate <- lambda[k]\nx <- rgamma(n, 3, rate)\nFor density plot, define f(x) <- sum(dgamma(x, 3, lambda)*theta) and apply across a sequence. Use plot(density(x), lwd=3) then loop for(j in 1:5) lines(density(rgamma(n,3,lambda[j]))).`},
+
+{type:'open', topic:'R',
+ q:`<strong>Write a general-purpose A-R function</strong> in R: <code>ar_sample(n, f, g, rg, c)</code> where f is the target density, g is the proposal density, rg is a function to sample from g, and c is the constant. The function should return a list containing the sample and the empirical acceptance rate.`,
+ hint:`function(n, f, g, rg, c) {\n  accepted <- numeric(n); count <- 0; trials <- 0\n  while(count < n) {\n    y <- rg(1); u <- runif(1); trials <- trials+1\n    if(u <= f(y)/(c*g(y))) { count <- count+1; accepted[count] <- y }\n  }\n  list(sample=accepted, acceptance_rate=n/trials)\n}`},
+
+{type:'open', topic:'R',
+ q:`<strong>Debug and fix</strong> the following R code intended to generate Beta(2,3) samples via A-R with Unif(0,1) proposal:<br><pre class="code-block" style="margin:0.7rem 0 0">n &lt;- 1000; k &lt;- 0; y &lt;- numeric(n)
+c &lt;- 1  <span class="cmt"># bug!</span>
+while(k &lt; n) {
+  x &lt;- runif(1); u &lt;- runif(1)
+  if(u &lt; dbeta(x,2,3)/c) { k &lt;- k+1; y[k] &lt;- x }
+}</pre>Identify the bug, explain why it matters, and provide the corrected code.`,
+ hint:`Bug: c=1 is incorrect. For Beta(2,3), the max of dbeta(x,2,3) ≈ 2.074 (at mode x=(a-1)/(a+b-2)=0.25). Using c=1 violates the envelope condition dbeta(x,2,3) ≤ c·g(x)=c·1 for some x, leading to acceptance rates > 1 and invalid sampling.\nFix: c <- optimize(function(x) dbeta(x,2,3), c(0,1), maximum=TRUE)$objective`},
+
+]; // end questions array
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let state = {};
+let currentFilter = 'all';
+
+function initState() {
+  state = {};
+  questions.forEach((q,i) => state[i] = { answered: false, correct: null, revealed: false });
+}
+initState();
+
+// ═══════════════════════════════════════════════════
+//  COUNTS
+// ═══════════════════════════════════════════════════
+function updateCounts() {
+  document.getElementById('count-tf').textContent   = questions.filter(q=>q.type==='tf').length;
+  document.getElementById('count-mc').textContent   = questions.filter(q=>q.type==='mc').length;
+  document.getElementById('count-fill').textContent = questions.filter(q=>q.type==='fill').length;
+  document.getElementById('count-open').textContent = questions.filter(q=>q.type==='open').length;
+}
+
+// ═══════════════════════════════════════════════════
+//  SCOREBOARD
+// ═══════════════════════════════════════════════════
+function updateScore() {
+  const vals = Object.values(state);
+  const answered  = vals.filter(v=>v.answered || v.revealed).length;
+  const correct   = vals.filter(v=>v.correct===true).length;
+  const wrong     = vals.filter(v=>v.correct===false).length;
+  const revealed  = vals.filter(v=>v.revealed && !v.answered).length;
+  document.getElementById('scoreCorrect').textContent  = correct;
+  document.getElementById('scoreWrong').textContent    = wrong;
+  document.getElementById('scoreRevealed').textContent = revealed;
+  document.getElementById('scoreTotal').textContent    = answered;
+  const pct = (correct + wrong) > 0 ? Math.round(100*correct/(correct+wrong))+'%' : '—';
+  document.getElementById('scorePct').textContent = pct;
+  const total = questions.length;
+  document.getElementById('progressBar').style.width = (answered/total*100)+'%';
+}
+
+// ═══════════════════════════════════════════════════
+//  BADGE LABELS
+// ═══════════════════════════════════════════════════
+const typeLabel = { tf:'T / F', mc:'Multiple Choice', fill:'Fill in Blanks', open:'Open-Ended' };
+const typeDotClass = { tf:'dot-tf', mc:'dot-mc', fill:'dot-fill', open:'dot-open' };
+
+// ═══════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════
+function render() {
+  const container = document.getElementById('questionContainer');
+  container.innerHTML = '';
+
+  const filtered = questions
+    .map((q,i) => ({q,i}))
+    .filter(({q}) => currentFilter === 'all' || q.type === currentFilter);
+
+  if(filtered.length === 0) {
+    container.innerHTML = '<div class="empty">No questions match this filter.</div>';
+    return;
+  }
+
+  // group by type when showing all
+  const groups = currentFilter === 'all'
+    ? [
+        { label:'True / False',      dot:'dot-tf',   items: filtered.filter(({q})=>q.type==='tf') },
+        { label:'Multiple Choice',   dot:'dot-mc',   items: filtered.filter(({q})=>q.type==='mc') },
+        { label:'Fill in the Blanks',dot:'dot-fill', items: filtered.filter(({q})=>q.type==='fill') },
+        { label:'Open-Ended Coding', dot:'dot-open', items: filtered.filter(({q})=>q.type==='open') },
+      ]
+    : [{ label: typeLabel[currentFilter], dot: typeDotClass[currentFilter], items: filtered }];
+
+  let displayNum = 0;
+  groups.forEach(group => {
+    if(group.items.length === 0) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.innerHTML = `<span class="section-dot ${group.dot}"></span>${group.label} <em style="color:var(--text3);font-style:normal">(${group.items.length})</em>`;
+    container.appendChild(lbl);
+
+    group.items.forEach(({q,i}) => {
+      displayNum++;
+      container.appendChild(buildCard(q, i, displayNum));
+    });
+  });
+
+  updateScore();
+}
+
+// ═══════════════════════════════════════════════════
+//  BUILD CARD
+// ═══════════════════════════════════════════════════
+function buildCard(q, idx, displayNum) {
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = `card-${idx}`;
+  const s = state[idx];
+  if(s.correct === true)  card.classList.add('answered-correct');
+  if(s.correct === false) card.classList.add('answered-wrong');
+  if(s.revealed)          card.classList.add('revealed');
+
+  // header
+  const header = document.createElement('div');
+  header.className = 'q-header';
+  header.innerHTML = `
+    <span class="q-num">#${displayNum}</span>
+    <span class="q-badge badge-${q.type}">${typeLabel[q.type]}</span>
+    <span class="q-text">${q.q}</span>`;
+  card.appendChild(header);
+
+  // body
+  if(q.type === 'tf') buildTF(card, q, idx);
+  else if(q.type === 'mc') buildMC(card, q, idx);
+  else if(q.type === 'fill') buildFill(card, q, idx);
+  else buildOpen(card, q, idx);
+
+  // answer box
+  const abox = document.createElement('div');
+  abox.className = 'answer-box' + (s.answered || s.revealed ? ' show' : '');
+  abox.id = `ans-${idx}`;
+  if(q.type !== 'open') {
+    abox.innerHTML = `<span class="ans-label">Answer & Explanation</span><strong>Answer: ${q.answer || q.opts?.[['A','B','C','D'].indexOf(q.answer)]}</strong><br><br>${q.explanation}`;
+  } else {
+    abox.innerHTML = `<span class="ans-label">Model Answer / Key Points</span>${q.hint}`;
+  }
+  card.appendChild(abox);
+
+  return card;
+}
+
+function buildTF(card, q, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tf-wrap';
+  ['TRUE','FALSE'].forEach(val => {
+    const btn = document.createElement('button');
+    btn.className = 'tf-btn';
+    btn.textContent = val;
+    const s = state[idx];
+    if(s.answered) {
+      if(val === q.answer) btn.classList.add('correct');
+      else if(s.selected === val) btn.classList.add('wrong');
+    }
+    btn.addEventListener('click', () => handleTF(idx, val, q));
+    wrap.appendChild(btn);
+  });
+  card.appendChild(wrap);
+  appendFooter(card, idx, 'tf', q);
+}
+
+function handleTF(idx, val, q) {
+  if(state[idx].answered) return;
+  state[idx].answered = true;
+  state[idx].selected = val;
+  state[idx].correct  = (val === q.answer);
+  const card = document.getElementById(`card-${idx}`);
+  card.querySelectorAll('.tf-btn').forEach(btn => {
+    if(btn.textContent === q.answer) btn.classList.add('correct');
+    else if(btn.textContent === val) btn.classList.add('wrong');
+  });
+  showAnswer(idx, state[idx].correct);
+  updateScore();
+}
+
+function buildMC(card, q, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'opts';
+  const keys = ['A','B','C','D'];
+  q.opts.forEach((opt, oi) => {
+    const key = keys[oi];
+    const div = document.createElement('div');
+    div.className = 'opt';
+    const s = state[idx];
+    if(s.answered) {
+      if(key === q.answer) div.classList.add('correct');
+      else if(s.selected === key) div.classList.add('wrong');
+    }
+    div.innerHTML = `<span class="opt-key">${key}</span><span class="opt-label">${opt}</span>`;
+    div.addEventListener('click', () => handleMC(idx, key, q));
+    wrap.appendChild(div);
+  });
+  card.appendChild(wrap);
+  appendFooter(card, idx, 'mc', q);
+}
+
+function handleMC(idx, key, q) {
+  if(state[idx].answered) return;
+  state[idx].answered = true;
+  state[idx].selected = key;
+  state[idx].correct  = (key === q.answer);
+  const card = document.getElementById(`card-${idx}`);
+  const keys = ['A','B','C','D'];
+  card.querySelectorAll('.opt').forEach((opt, oi) => {
+    const k = keys[oi];
+    if(k === q.answer) opt.classList.add('correct');
+    else if(k === key) opt.classList.add('wrong');
+  });
+  showAnswer(idx, state[idx].correct);
+  updateScore();
+}
+
+function buildFill(card, q, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'fill-wrap';
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'fill-input';
+  inp.placeholder = 'Type your answer here…';
+  inp.id = `fill-${idx}`;
+  const s = state[idx];
+  if(s.answered) {
+    inp.value = s.userVal || '';
+    inp.classList.add(s.correct ? 'correct' : 'wrong');
+    inp.disabled = true;
+  }
+  wrap.appendChild(inp);
+  card.appendChild(wrap);
+  appendFooter(card, idx, 'fill', q);
+}
+
+function handleFill(idx, q) {
+  if(state[idx].answered) return;
+  const inp = document.getElementById(`fill-${idx}`);
+  const userVal = inp.value.trim();
+  if(!userVal) return;
+  // flexible matching: lowercase, strip spaces
+  const norm = s => s.toLowerCase().replace(/\s+/g,'').replace(/[⁻¹]/g,'');
+  const correct = norm(userVal) === norm(q.answer);
+  state[idx].answered = true;
+  state[idx].correct  = correct;
+  state[idx].userVal  = userVal;
+  inp.classList.add(correct ? 'correct' : 'wrong');
+  inp.disabled = true;
+  showAnswer(idx, correct);
+  updateScore();
+}
+
+function buildOpen(card, q, idx) {
+  const s = state[idx];
+  const hbox = document.createElement('div');
+  hbox.className = 'hint-box' + (s.revealed ? ' show' : '');
+  hbox.id = `hint-${idx}`;
+  hbox.innerHTML = `<span class="hint-label">Key Points / Hints</span>${q.hint}`;
+  card.appendChild(hbox);
+  appendFooter(card, idx, 'open', q);
+}
+
+function appendFooter(card, idx, type, q) {
+  const footer = document.createElement('div');
+  footer.className = 'q-footer';
+
+  if(type === 'fill') {
+    const btn = document.createElement('button');
+    btn.className = 'btn-check';
+    btn.textContent = 'Check Answer';
+    btn.addEventListener('click', () => handleFill(idx, q));
+    footer.appendChild(btn);
+  } else if(type === 'open') {
+    // no check btn for open
+  }
+
+  // reveal button (always)
+  const rev = document.createElement('button');
+  rev.className = 'btn-reveal';
+  rev.textContent = state[idx].answered ? 'Answer shown' : 'Reveal Answer';
+  rev.addEventListener('click', () => revealAnswer(idx, q, type));
+  footer.appendChild(rev);
+
+  // result badge
+  const res = document.createElement('span');
+  res.className = 'q-result';
+  res.id = `res-${idx}`;
+  if(state[idx].correct === true)  { res.textContent = '✓ Correct'; res.classList.add('ok'); }
+  if(state[idx].correct === false) { res.textContent = '✗ Wrong';  res.classList.add('bad'); }
+  footer.appendChild(res);
+
+  card.appendChild(footer);
+}
+
+function showAnswer(idx, correct) {
+  document.getElementById(`ans-${idx}`)?.classList.add('show');
+  const res = document.getElementById(`res-${idx}`);
+  if(res) {
+    res.textContent = correct ? '✓ Correct' : '✗ Wrong';
+    res.classList.toggle('ok',  correct);
+    res.classList.toggle('bad', !correct);
+  }
+  const card = document.getElementById(`card-${idx}`);
+  card.classList.toggle('answered-correct', correct);
+  card.classList.toggle('answered-wrong',  !correct);
+}
+
+function revealAnswer(idx, q, type) {
+  if(state[idx].answered) return;
+  state[idx].revealed = true;
+  const abox = document.getElementById(`ans-${idx}`);
+  abox?.classList.add('show');
+  const hbox = document.getElementById(`hint-${idx}`);
+  hbox?.classList.add('show');
+  const card = document.getElementById(`card-${idx}`);
+  card.classList.add('revealed');
+  updateScore();
+}
+
+// ═══════════════════════════════════════════════════
+//  FILTER
+// ═══════════════════════════════════════════════════
+document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => {
+      b.classList.remove('active','active-tf','active-mc','active-fill','active-open');
+    });
+    if(currentFilter === 'all') btn.classList.add('active');
+    else btn.classList.add(`active-${currentFilter}`);
+    render();
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(!confirm('Reset all answers and progress?')) return;
+  initState();
+  render();
+});
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+updateCounts();
+render();
+</script>
+</body>
+</html>
